@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { login, register } from '../lib/api';
+import { login as apiLogin, register } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 
 function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -8,12 +9,15 @@ function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const { login } = useAuth();
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (mode === 'signin') {
       try {
-        const response = await login(email, password);
+        const response = await apiLogin(email, password);
         console.log(response);
+        login(response.token);
       } catch (e) {
         console.error(e);
       }
@@ -21,6 +25,7 @@ function LoginPage() {
       try {
         const response = await register(name, email, password);
         console.log(response);
+        login(response.token);
       } catch (e) {
         console.error(e);
       }

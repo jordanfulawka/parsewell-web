@@ -4,4 +4,13 @@ interface User {
   email: string;
 }
 
-export type { User };
+interface BaseResume {
+  id: string;
+  userId: string;
+  content: string;
+  origianlFileUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type { User, BaseResume };
