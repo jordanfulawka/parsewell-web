@@ -29,15 +29,25 @@ function Applications() {
     if (!token) return;
     const presignedUrl = await getPresignedPutUrl(token);
     if (e.target.files) {
-      setBaseResumeFile(e.target.files[0]);
       const file = e.target.files[0];
-      fetch(presignedUrl, {
+      await fetch(presignedUrl, {
         method: 'PUT',
         body: file,
         headers: {
           'Content-Type': file.type,
         },
       });
+      const response = await fetch(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/resumes/me`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      const baseResumeFile = await response.json();
+      setBaseResume(baseResumeFile);
     }
   }
 

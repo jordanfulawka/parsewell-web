@@ -10,7 +10,6 @@ interface BaseResume {
   content: string;
   origianlFileUrl: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 export type { User, BaseResume };
