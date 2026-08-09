@@ -1,32 +1,48 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router';
-import { generateResumeEdits, getApplicationById } from '../lib/api';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useParams } from 'react-router';
+import { getApplicationById, getEditSuggestions } from '../lib/api';
+import { ChevronDown } from 'lucide-react';
+import type { Application, EditSuggestion } from '../lib/types';
+
+function parseDate(raw: string) {
+  const truncated = raw.replace(/(\.\d{3})\d+$/, '$1');
+
+  return new Date(truncated).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+  });
+}
 
 function ApplicationDetails() {
-  const [companyName, setCompanyName] = useState('');
-  const [roleTitle, setRoleTitle] = useState('');
-  const [location, setLocation] = useState('');
-  const [jobDescription, setJobDescription] = useState('');
+  const [application, setApplication] = useState<Application>();
+  const [editSuggestions, setEditSuggestions] = useState<EditSuggestion[]>([]);
+  const [showJobDescription, setShowJobDescription] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const params = useParams();
-  const navigate = useNavigate();
   const { token } = useAuth();
+  const params = useParams();
 
   useEffect(() => {
     async function fetchApplication() {
       try {
         if (!token) return;
         if (typeof params.id !== 'string') return;
+        const application = await getApplicationById(token, params.id);
+        setApplication(application);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    async function fetchEditSuggestions() {
+      try {
+        if (!token) return;
+        if (typeof params.id !== 'string') return;
         setLoading(true);
-        const { companyName, roleTitle, location, jobDescription } =
-          await getApplicationById(token, params.id);
-        setCompanyName(companyName);
-        setRoleTitle(roleTitle);
-        setLocation(location);
-        setJobDescription(jobDescription);
+        const editSuggestions = await getEditSuggestions(token, params.id);
+        setEditSuggestions(editSuggestions);
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -34,117 +50,81 @@ function ApplicationDetails() {
         setLoading(false);
       }
     }
-    if (params.id) {
-      fetchApplication();
-    }
-  }, [token]);
-
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    console.log('hi!');
-    console.log(params.id);
-    console.log(token);
-    console.log(typeof params.id);
-    try {
-      if (!token) return;
-      if (typeof params.id !== 'string') return;
-      setLoading(true);
-      const response = await generateResumeEdits(token, params.id);
-      console.log(response);
-      setLoading(false);
-      navigate(`/applications/${params.id}`);
-    } catch (err) {
-      setError(err.message);
-      console.log(err);
-    }
-  }
-
-  if (loading) {
-    return <div>loading!</div>;
-  }
+    fetchApplication();
+    fetchEditSuggestions();
+  }, [token, params.id]);
 
   return (
-    <div className='p-10 flex justify-center'>
-      <div className='w-150 flex flex-col gap-10'>
-        {params.id ? (
-          <div className='flex flex-col gap-1'>
-            <h2 className='text-2xl font-bold'>Review the details</h2>
-            <p className='text-secondary-text'>
-              We pulled this from the posting. Double check before continuing
-            </p>
+    <div className='p-10 flex flex-col gap-8'>
+      <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5'>
+        <div className='flex flex-col gap-2'>
+          <div className='text-2xl font-bold'>{application?.companyName}</div>
+          <div className=''>
+            {application?.roleTitle}{' '}
+            <span className='text-xs font-light'>•</span>{' '}
+            {application?.location}
           </div>
-        ) : (
-          <div className='flex flex-col gap-1'>
-            <h2 className='text-2xl font-bold'>Enter the details</h2>
-            <p className='text-secondary-text'>
-              Put the job information here. Double check befor submission
-            </p>
+          <div className='text-secondary-text'>
+            Applied{' '}
+            {application?.createdAt ? parseDate(application.createdAt) : ''}
           </div>
-        )}
-        <form className='w-full flex flex-col gap-5' onSubmit={handleSubmit}>
-          <div>
-            <label className='font-bold text-primary-text text-sm'>
-              Company Name
-            </label>
-            <input
-              type='text'
-              placeholder='e.g. Scotiabank, Google, Stripe'
-              className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className='font-bold text-primary-text text-sm'>
-              Role Title
-            </label>
-            <input
-              type='text'
-              placeholder='e.g. Full Stack Engineer, Data Engineer, Embedded Software Developer'
-              className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
-              value={roleTitle}
-              onChange={(e) => setRoleTitle(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className='font-bold text-primary-text text-sm'>
-              Location
-            </label>
-            <input
-              type='text'
-              placeholder='e.g. Toronto, San Francisco, Remote (US)'
-              className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <label className='font-bold text-primary-text text-sm'>
-              Job Description
-            </label>
-            <textarea
-              placeholder='Paste the full job description here...'
-              rows={7}
-              className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
-              value={jobDescription}
-              onChange={(e) => setJobDescription(e.target.value)}
-              required
-            ></textarea>
-          </div>
-          <div>
-            <button
-              type='submit'
-              className='bg-[#7FA687] p-3 rounded-xl w-full hover:bg-[#6D9476]'
-            >
-              <span className='font-bold text-white'>
-                Save & Generate Edits
-              </span>
-            </button>
-          </div>
-        </form>
+        </div>
+        <div className='flex gap-4'>
+          <button
+            className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'APPLIED' ? 'bg-[#F0DFC5] text-[#8A5C2C] border-[#8A5C2C]' : 'text-secondary-text border-subtle-border'}`}
+            onClick={() => {
+              if (!application) return;
+              setApplication({ ...application, applicationStatus: 'APPLIED' });
+            }}
+          >
+            <span className='text-sm'>Applied</span>
+          </button>
+          <button
+            className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'HEARD_BACK' ? 'bg-[#DDEBE0] text-[#345F3E] border-[#345F3E]' : 'text-secondary-text border-subtle-border'}`}
+            onClick={() => {
+              if (!application) return;
+              setApplication({
+                ...application,
+                applicationStatus: 'HEARD_BACK',
+              });
+            }}
+          >
+            <span className='text-sm'>Heard Back</span>
+          </button>
+          <button
+            className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'REJECTED' ? 'bg-[#E8C4B8] text-[#8A3B2E] border-[#8A3B2E]' : 'text-secondary-text border-subtle-border'}`}
+            onClick={() => {
+              if (!application) return;
+              setApplication({ ...application, applicationStatus: 'REJECTED' });
+            }}
+          >
+            <span className='text-sm'>Rejected</span>
+          </button>
+          <button
+            className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'GHOSTED' ? 'bg-[#E3C6BE] text-[#8C4A3D] border-[#8C4A3D]' : 'text-secondary-text border-subtle-border'}`}
+            onClick={() => {
+              if (!application) return;
+              setApplication({ ...application, applicationStatus: 'GHOSTED' });
+            }}
+          >
+            <span className='text-sm'>Ghosted</span>
+          </button>
+        </div>
+        <div className='bg-tertiary-text/30 h-px' />
+        <div className='flex items-center gap-2'>
+          <h4 className='font-bold text-primary-text'>Job description</h4>
+          <button
+            className={`${showJobDescription ? '' : 'rotate-180'} transition-transform`}
+            onClick={() => setShowJobDescription((prev) => !prev)}
+          >
+            <ChevronDown size={16} />
+          </button>
+        </div>
+        {showJobDescription && <p>{application?.jobDescription}</p>}
+      </div>
+      <div>
+        <h2 className='text-xl font-bold'>Resume Edits</h2>
+        <div></div>
       </div>
     </div>
   );
@@ -152,4 +132,6 @@ function ApplicationDetails() {
 
 export default ApplicationDetails;
 
-// http://localhost:5173/applications/details/ea75cab5-daae-4e42-987f-fee206e16bc9
+// http://localhost:5173/applications/ea75cab5-daae-4e42-987f-fee206e16bc9
+
+// https://jobs.ashbyhq.com/relayfi/c412e8d5-d7fc-4dde-b905-e3e4ceb03c08

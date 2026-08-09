@@ -5,7 +5,8 @@ import Applications from './pages/Applications';
 import Insights from './pages/Insights';
 import { AuthProvider } from './contexts/AuthContext';
 import AddApplication from './pages/AddApplication';
-import ApplicationReview from './pages/ApplicationDetails';
+import ApplicationReview from './pages/ApplicationReview';
+import ApplicationDetails from './pages/ApplicationDetails';
 
 function App() {
   return (
@@ -17,13 +18,15 @@ function App() {
             <Route path='/applications' element={<Applications />} />
             <Route path='/applications/new' element={<AddApplication />} />
             <Route
-              path='/applications/details/:id'
+              path='/applications/review'
               element={<ApplicationReview />}
             />
+            <Route path='/applications/:id' element={<ApplicationDetails />} />
             <Route
-              path='/applications/details'
+              path='/applications/review/:id'
               element={<ApplicationReview />}
             />
+
             <Route path='/insights' element={<Insights />} />
           </Route>
         </Routes>

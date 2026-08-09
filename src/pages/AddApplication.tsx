@@ -11,12 +11,17 @@ function AddApplication() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!token) return;
-    setLoading(true);
-    const response = await parseJobUrlAndGenerateDraftApplication(token, url);
-    setLoading(false);
-    navigate(`/applications/details/${response.id}`);
-    console.log(response);
+    try {
+      if (!token) return;
+      setLoading(true);
+      const response = await parseJobUrlAndGenerateDraftApplication(token, url);
+      setLoading(false);
+      navigate(`/applications/review/${response.id}`);
+    } catch (err) {
+      console.log(err);
+      console.log('couldnt extract info');
+      navigate('/applications/review');
+    }
   }
 
   if (loading) {
@@ -53,6 +58,7 @@ function AddApplication() {
         <button
           type='submit'
           className='border border-subtle-border p-3 rounded-xl w-full'
+          onClick={() => navigate('/applications/review')}
         >
           <span className='font-bold '>Enter manually</span>
         </button>

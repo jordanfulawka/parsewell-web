@@ -15,16 +15,43 @@ interface BaseResume {
 
 interface Application {
   id?: string;
-  userId: string;
-  baseResumeId: string;
+  userId?: string;
+  baseResumeId?: string;
   companyName: string;
   roleTitle: string;
   location: string;
-  jobUrl: string;
+  jobUrl?: string;
   jobDescription: string;
-  applicationChannel: string;
-  applicationStatus: string;
-  notes: string;
+  applicationChannel?: string;
+  applicationStatus?: string;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export type { User, BaseResume, Application };
+interface EditSuggestion {
+  id: string;
+  applicationId: string;
+  section: string;
+  beforeText: string;
+  afterText: string;
+  reason: string;
+  editType: string;
+  orderIndex: number;
+}
+
+type ApplicationStatus =
+  | 'APPLIED'
+  | 'HEARD_BACK'
+  | 'REJECTED'
+  | 'GHOSTED'
+  | 'PROCESSING'
+  | 'DRAFT';
+
+export type {
+  User,
+  BaseResume,
+  Application,
+  EditSuggestion,
+  ApplicationStatus,
+};

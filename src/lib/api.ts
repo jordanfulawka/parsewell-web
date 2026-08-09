@@ -1,3 +1,5 @@
+import type { Application } from './types';
+
 async function login(email: string, password: string) {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/auth/signin`,
@@ -108,6 +110,44 @@ async function parseJobUrlAndGenerateDraftApplication(
   return response.json();
 }
 
+async function createApplication(token: string, application: Application) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ application }),
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
+async function updateApplication(token: string, application: Application) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${application.id}`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(application),
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
 async function getApplicationById(token: string, applicationId: string) {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}`,
@@ -141,6 +181,22 @@ async function generateResumeEdits(token: string, applicationId: string) {
   return response.json();
 }
 
+async function getEditSuggestions(token: string, applicationId: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/edits`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
 export {
   login,
   register,
@@ -150,6 +206,9 @@ export {
   parseJobUrlAndGenerateDraftApplication,
   getApplicationById,
   generateResumeEdits,
+  createApplication,
+  updateApplication,
+  getEditSuggestions,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}
