@@ -15,7 +15,7 @@ function AddApplication() {
     setLoading(true);
     const response = await parseJobUrlAndGenerateDraftApplication(token, url);
     setLoading(false);
-    navigate(`/applications/review/${response.id}`);
+    navigate(`/applications/details/${response.id}`);
     console.log(response);
   }
 

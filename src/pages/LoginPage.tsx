@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { login as apiLogin, register } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router';
 
 function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -10,6 +11,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
 
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -18,6 +20,7 @@ function LoginPage() {
         const response = await apiLogin(email, password);
         console.log(response);
         login(response.token);
+        navigate('/applications');
       } catch (e) {
         console.error(e);
       }
@@ -26,6 +29,7 @@ function LoginPage() {
         const response = await register(name, email, password);
         console.log(response);
         login(response.token);
+        navigate('/applications');
       } catch (e) {
         console.error(e);
       }

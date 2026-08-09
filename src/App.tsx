@@ -5,6 +5,7 @@ import Applications from './pages/Applications';
 import Insights from './pages/Insights';
 import { AuthProvider } from './contexts/AuthContext';
 import AddApplication from './pages/AddApplication';
+import ApplicationReview from './pages/ApplicationDetails';
 
 function App() {
   return (
@@ -15,6 +16,14 @@ function App() {
           <Route path='/' element={<AppLayout />}>
             <Route path='/applications' element={<Applications />} />
             <Route path='/applications/new' element={<AddApplication />} />
+            <Route
+              path='/applications/details/:id'
+              element={<ApplicationReview />}
+            />
+            <Route
+              path='/applications/details'
+              element={<ApplicationReview />}
+            />
             <Route path='/insights' element={<Insights />} />
           </Route>
         </Routes>

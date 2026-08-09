@@ -108,6 +108,22 @@ async function parseJobUrlAndGenerateDraftApplication(
   return response.json();
 }
 
+async function getApplicationById(token: string, applicationId: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
 export {
   login,
   register,
@@ -115,6 +131,7 @@ export {
   getPresignedPutUrl,
   uploadBaseResume,
   parseJobUrlAndGenerateDraftApplication,
+  getApplicationById,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

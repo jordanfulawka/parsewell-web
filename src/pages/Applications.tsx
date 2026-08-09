@@ -7,7 +7,7 @@ import {
   uploadBaseResume,
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
-import { Link, redirect } from 'react-router';
+import { Link } from 'react-router';
 
 function parseDate(raw: string) {
   const truncated = raw.replace(/(\.\d{3})\d+$/, '$1');
