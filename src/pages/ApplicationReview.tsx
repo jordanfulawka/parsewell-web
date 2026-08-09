@@ -4,11 +4,10 @@ import {
   createApplication,
   generateResumeEdits,
   getApplicationById,
-  getEditSuggestions,
   updateApplication,
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
-import type { Application, EditSuggestion } from '../lib/types';
+import type { Application } from '../lib/types';
 
 function ApplicationReview() {
   const [error, setError] = useState('');

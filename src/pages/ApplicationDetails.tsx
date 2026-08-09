@@ -4,6 +4,7 @@ import { useParams } from 'react-router';
 import { getApplicationById, getEditSuggestions } from '../lib/api';
 import { ChevronDown } from 'lucide-react';
 import type { Application, EditSuggestion } from '../lib/types';
+import EditSuggestionItem from '../components/EditSuggestionItem';
 
 function parseDate(raw: string) {
   const truncated = raw.replace(/(\.\d{3})\d+$/, '$1');
@@ -55,7 +56,7 @@ function ApplicationDetails() {
   }, [token, params.id]);
 
   return (
-    <div className='p-10 flex flex-col gap-8'>
+    <div className='bg-cream-primary p-10 flex flex-col gap-8'>
       <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5'>
         <div className='flex flex-col gap-2'>
           <div className='text-2xl font-bold'>{application?.companyName}</div>
@@ -124,7 +125,11 @@ function ApplicationDetails() {
       </div>
       <div>
         <h2 className='text-xl font-bold'>Resume Edits</h2>
-        <div></div>
+        <div className='flex flex-col gap-3'>
+          {editSuggestions.map((editSuggestion: EditSuggestion) => (
+            <EditSuggestionItem editSuggestion={editSuggestion} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -132,6 +137,6 @@ function ApplicationDetails() {
 
 export default ApplicationDetails;
 
-// http://localhost:5173/applications/ea75cab5-daae-4e42-987f-fee206e16bc9
+// http://localhost:5173/applications/0eebc467-fa6d-498d-a986-8b6228da914f
 
 // https://jobs.ashbyhq.com/relayfi/c412e8d5-d7fc-4dde-b905-e3e4ceb03c08
