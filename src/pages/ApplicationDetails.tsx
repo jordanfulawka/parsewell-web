@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
-import { getApplicationById } from '../lib/api';
+import { useEffect, useState, type FormEvent } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import { generateResumeEdits, getApplicationById } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 
 function ApplicationDetails() {
@@ -8,25 +8,60 @@ function ApplicationDetails() {
   const [roleTitle, setRoleTitle] = useState('');
   const [location, setLocation] = useState('');
   const [jobDescription, setJobDescription] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const params = useParams();
+  const navigate = useNavigate();
   const { token } = useAuth();
 
   useEffect(() => {
     async function fetchApplication() {
-      if (!token) return;
-      if (typeof params.id !== 'string') return;
-      const { companyName, roleTitle, location, jobDescription } =
-        await getApplicationById(token, params.id);
-      setCompanyName(companyName);
-      setRoleTitle(roleTitle);
-      setLocation(location);
-      setJobDescription(jobDescription);
+      try {
+        if (!token) return;
+        if (typeof params.id !== 'string') return;
+        setLoading(true);
+        const { companyName, roleTitle, location, jobDescription } =
+          await getApplicationById(token, params.id);
+        setCompanyName(companyName);
+        setRoleTitle(roleTitle);
+        setLocation(location);
+        setJobDescription(jobDescription);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        console.log(err);
+        setLoading(false);
+      }
     }
     if (params.id) {
       fetchApplication();
     }
-  }, [token, params.id]);
+  }, [token]);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    console.log('hi!');
+    console.log(params.id);
+    console.log(token);
+    console.log(typeof params.id);
+    try {
+      if (!token) return;
+      if (typeof params.id !== 'string') return;
+      setLoading(true);
+      const response = await generateResumeEdits(token, params.id);
+      console.log(response);
+      setLoading(false);
+      navigate(`/applications/${params.id}`);
+    } catch (err) {
+      setError(err.message);
+      console.log(err);
+    }
+  }
+
+  if (loading) {
+    return <div>loading!</div>;
+  }
 
   return (
     <div className='p-10 flex justify-center'>
@@ -46,7 +81,7 @@ function ApplicationDetails() {
             </p>
           </div>
         )}
-        <form className='w-full flex flex-col gap-5'>
+        <form className='w-full flex flex-col gap-5' onSubmit={handleSubmit}>
           <div>
             <label className='font-bold text-primary-text text-sm'>
               Company Name
@@ -102,7 +137,7 @@ function ApplicationDetails() {
           <div>
             <button
               type='submit'
-              className='bg-[#7FA687] p-3 rounded-xl w-full'
+              className='bg-[#7FA687] p-3 rounded-xl w-full hover:bg-[#6D9476]'
             >
               <span className='font-bold text-white'>
                 Save & Generate Edits
