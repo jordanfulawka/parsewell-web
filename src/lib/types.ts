@@ -8,6 +8,7 @@ interface BaseResume {
   id: string;
   userId: string;
   content: string;
+  fileName: string;
   origianlFileUrl: string;
   createdAt: string;
 }

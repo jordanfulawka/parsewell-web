@@ -1,13 +1,26 @@
-import { Plus, FileText } from 'lucide-react';
+import { Plus, FileText, FileExclamationPoint } from 'lucide-react';
 import { useEffect, useState, type ChangeEvent } from 'react';
 import type { BaseResume } from '../lib/types';
-import { getBaseResume, getPresignedPutUrl } from '../lib/api';
+import {
+  getBaseResume,
+  getPresignedPutUrl,
+  uploadBaseResume,
+} from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+
+function parseDate(raw: string) {
+  const truncated = raw.replace(/(\.\d{3})\d+$/, '$1');
+
+  return new Date(truncated).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
 
 function Applications() {
   const [baseResume, setBaseResume] = useState<BaseResume | null>(null);
   const [error, setError] = useState('');
-  const [baseResumeFile, setBaseResumeFile] = useState<File | null>(null);
 
   const { token } = useAuth();
 
@@ -27,33 +40,30 @@ function Applications() {
   async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
     if (!token) return;
-    const presignedUrl = await getPresignedPutUrl(token);
-    if (e.target.files) {
-      const file = e.target.files[0];
-      await fetch(presignedUrl, {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
-      const response = await fetch(
-        `${import.meta.env.VITE_BASE_URL}/api/v1/resumes/me`,
-        {
+    try {
+      const presignedUrl = await getPresignedPutUrl(token);
+      if (e.target.files) {
+        const file = e.target.files[0];
+        await fetch(presignedUrl, {
           method: 'PUT',
+          body: file,
           headers: {
-            Authorization: `Bearer ${token}`,
+            'Content-Type': file.type,
           },
-        },
-      );
-      const baseResumeFile = await response.json();
-      setBaseResume(baseResumeFile);
+        });
+        const baseResume = await uploadBaseResume(token, file.name);
+        console.log(baseResume);
+        setBaseResume(baseResume);
+      }
+    } catch (err: any) {
+      setError(err.message);
+      console.log(err);
     }
   }
 
   return (
     <div className='h-full flex justify-center'>
-      <div className='flex flex-col gap-10 h-fit w-150 m-10'>
+      <div className='flex flex-col gap-10 h-fit w-170 m-10'>
         <div className='flex items-center justify-between w-full'>
           <h1 className='text-3xl font-extrabold'>Applications</h1>
           <button className='flex gap-2 bg-[#7FA687] p-3 rounded-2xl text-white font-bold'>
@@ -61,14 +71,45 @@ function Applications() {
           </button>
         </div>
         {baseResume ? (
-          <div className='bg-[#FDFBF8]'>base resume found</div>
+          <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
+            <div>
+              <div className='flex items-center gap-2'>
+                <div className='bg-[#DDEBE0] p-3 rounded-lg'>
+                  <FileText color='#345F3E' />
+                </div>
+                <div className='flex flex-col '>
+                  <span className='font-semibold'>
+                    Resume successfully uploaded!
+                  </span>
+                  <span className='text-secondary-text text-sm'>
+                    Uploaded {parseDate(baseResume.createdAt)} •{' '}
+                    {baseResume.fileName}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label
+                className='border border-subtle-border px-3 py-2.5 rounded-2xl hover:bg-[#ECE3D6]'
+                htmlFor='baseResumeUpload'
+              >
+                <span className='font-semibold'>Replace</span>
+                <input
+                  type='file'
+                  className='hidden'
+                  id='baseResumeUpload'
+                  onChange={handleUpload}
+                />
+              </label>
+            </div>
+          </div>
         ) : (
           <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
             <div className='flex items-center gap-2'>
-              <div className='bg-[#DDEBE0] p-3 rounded-lg'>
-                <FileText color='#345F3E' />
+              <div className='bg-[#F0DFC5] p-3 rounded-lg'>
+                <FileExclamationPoint color='#8A5C2C' />
               </div>
-              <span className='font-semibold'>No base resume found</span>
+              <span className='font-semibold'>Upload a resume to start</span>
             </div>
             <div>
               <label

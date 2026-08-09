@@ -66,7 +66,27 @@ async function getPresignedPutUrl(token: string) {
   return response.text();
 }
 
-export { login, register, getBaseResume, getPresignedPutUrl };
+async function uploadBaseResume(token: string, fileName: string) {
+  console.log(JSON.stringify({ fileName }));
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/resumes/me`,
+    {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fileName }),
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
+export { login, register, getBaseResume, getPresignedPutUrl, uploadBaseResume };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}
 //final-materials/${userId}/${applicationId}/cover-letter/${randomUUID()}${ext}
