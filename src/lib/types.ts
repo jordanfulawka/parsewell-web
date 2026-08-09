@@ -13,4 +13,18 @@ interface BaseResume {
   createdAt: string;
 }
 
-export type { User, BaseResume };
+interface Application {
+  id?: string;
+  userId: string;
+  baseResumeId: string;
+  companyName: string;
+  roleTitle: string;
+  location: string;
+  jobUrl: string;
+  jobDescription: string;
+  applicationChannel: string;
+  applicationStatus: string;
+  notes: string;
+}
+
+export type { User, BaseResume, Application };

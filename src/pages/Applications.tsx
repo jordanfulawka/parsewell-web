@@ -7,6 +7,7 @@ import {
   uploadBaseResume,
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
+import { Link, redirect } from 'react-router';
 
 function parseDate(raw: string) {
   const truncated = raw.replace(/(\.\d{3})\d+$/, '$1');
@@ -66,9 +67,12 @@ function Applications() {
       <div className='flex flex-col gap-10 h-fit w-170 m-10'>
         <div className='flex items-center justify-between w-full'>
           <h1 className='text-3xl font-extrabold'>Applications</h1>
-          <button className='flex gap-2 bg-[#7FA687] p-3 rounded-2xl text-white font-bold'>
+          <Link
+            className='flex gap-2 bg-[#7FA687] p-3 rounded-2xl text-white font-bold cursor-pointer hover:bg-[#6D9476]'
+            to='/applications/new'
+          >
             <Plus /> New Application
-          </button>
+          </Link>
         </div>
         {baseResume ? (
           <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
