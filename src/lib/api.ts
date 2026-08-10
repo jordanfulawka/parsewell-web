@@ -328,6 +328,22 @@ async function createApplicationRequest(token: string, jobInformation: any) {
   return response.json();
 }
 
+async function getFinalMaterials(token: string, applicationId: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/materials`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
 export {
   login,
   register,
@@ -347,6 +363,7 @@ export {
   getFinalMaterialPresignedPutUrl,
   uploadResume,
   uploadCoverLetter,
+  getFinalMaterials,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

@@ -7,6 +7,7 @@ import {
   getCoverLetter,
   getEditSuggestions,
   getFinalMaterialPresignedPutUrl,
+  getFinalMaterials,
   updateApplication,
   uploadCoverLetter,
   uploadResume,
@@ -29,7 +30,8 @@ function ApplicationDetails() {
   const [editSuggestions, setEditSuggestions] = useState<EditSuggestion[]>([]);
   const [coverLetter, setCoverLetter] = useState('');
   const [showJobDescription, setShowJobDescription] = useState(false);
-  const [resume, setResume] = useState<File | null>(null);
+  const [uploadedResume, setUploadedResume] = useState('');
+  const [uploadedCoverLetter, setUploadedCoverLetter] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -76,9 +78,23 @@ function ApplicationDetails() {
       }
     }
 
+    async function fetchFinalMaterials() {
+      try {
+        if (!token) return;
+        if (typeof params.id !== 'string') return;
+        const finalMaterials = await getFinalMaterials(token, params.id);
+        console.log(finalMaterials);
+        setUploadedCoverLetter(finalMaterials.coverLetterFilename);
+        setUploadedResume(finalMaterials.resumeFilename);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
     fetchApplication();
     fetchEditSuggestions();
     fetchCoverLetter();
+    fetchFinalMaterials();
   }, [token, params.id]);
 
   async function updateStatus() {
@@ -128,6 +144,7 @@ function ApplicationDetails() {
           file.name,
         );
         console.log(uploadCoverLetter);
+        setUploadedCoverLetter(uploadedCoverLetter.coverLetterFilename);
       } else if (e.target.id === 'resumeUpload') {
         const presignedUrl = await getFinalMaterialPresignedPutUrl(
           token,
@@ -142,7 +159,7 @@ function ApplicationDetails() {
           },
         });
         const uploadedResume = await uploadResume(token, params.id, file.name);
-        console.log(uploadResume);
+        setUploadedResume(uploadedResume.resumeFilename);
       }
     }
   }
@@ -270,35 +287,47 @@ function ApplicationDetails() {
               <span className='text-primary-text font-bold text-sm'>
                 Resume Sent
               </span>
-              <label
-                className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
-                htmlFor='resumeUpload'
-              >
-                <Upload size={16} /> Attach resume
-                <input
-                  type='file'
-                  className='hidden'
-                  id='resumeUpload'
-                  onChange={handleUpload}
-                />
-              </label>
+              {uploadedResume ? (
+                <div className='flex items-center gap-2 font-bold text-sm text-tertiary-text'>
+                  {uploadedResume}
+                </div>
+              ) : (
+                <label
+                  className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
+                  htmlFor='resumeUpload'
+                >
+                  <Upload size={16} /> Attach resume
+                  <input
+                    type='file'
+                    className='hidden'
+                    id='resumeUpload'
+                    onChange={handleUpload}
+                  />
+                </label>
+              )}
             </div>
             <div className='flex-1 bg-[#FDFBF8] border border-subtle-border border-dashed p-5 flex flex-col gap-3 rounded-xl'>
               <span className='text-primary-text font-bold text-sm'>
                 Cover letter sent
               </span>
-              <label
-                className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
-                htmlFor='coverLetterUpload'
-              >
-                <Upload size={16} /> Attach cover letter
-                <input
-                  type='file'
-                  className='hidden'
-                  id='coverLetterUpload'
-                  onChange={handleUpload}
-                />
-              </label>
+              {uploadedCoverLetter ? (
+                <div className='flex items-center gap-2 font-bold text-sm text-tertiary-text'>
+                  {uploadedCoverLetter}
+                </div>
+              ) : (
+                <label
+                  className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
+                  htmlFor='coverLetterUpload'
+                >
+                  <Upload size={16} /> Attach cover letter
+                  <input
+                    type='file'
+                    className='hidden'
+                    id='coverLetterUpload'
+                    onChange={handleUpload}
+                  />
+                </label>
+              )}
             </div>
           </div>
         </div>
