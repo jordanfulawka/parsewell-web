@@ -8,7 +8,7 @@ import {
   uploadBaseResume,
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import ApplicationItem from '../components/ApplicationItem';
 
 function parseDate(raw: string) {
@@ -27,6 +27,7 @@ function Applications() {
   const [error, setError] = useState('');
 
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchBaseResume() {
@@ -148,7 +149,12 @@ function Applications() {
         )}
         <div className='flex flex-col gap-4'>
           {applications.map((application) => (
-            <ApplicationItem key={application.id} application={application} />
+            <div
+              onClick={() => navigate(`/applications/${application.id}`)}
+              key={application.id}
+            >
+              <ApplicationItem application={application} />
+            </div>
           ))}
         </div>
       </div>

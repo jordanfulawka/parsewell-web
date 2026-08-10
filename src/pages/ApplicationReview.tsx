@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import {
   createApplication,
+  createApplicationRequest,
   generateResumeEdits,
   getApplicationById,
   updateApplication,
@@ -13,12 +14,11 @@ function ApplicationReview() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [application, setApplication] = useState<Application>({
-    id: '',
     companyName: '',
     roleTitle: '',
     location: '',
+    jobUrl: 'No URL Provided',
     jobDescription: '',
-    applicationStatus: 'APPLIED',
   });
 
   const params = useParams();
@@ -57,7 +57,15 @@ function ApplicationReview() {
         console.log(application);
         returnedApplication = await updateApplication(token, application);
       } else {
-        returnedApplication = await createApplication(token, application);
+        const applicationRequest = await createApplicationRequest(
+          token,
+          application,
+        );
+        console.log(applicationRequest);
+        returnedApplication = await createApplication(
+          token,
+          applicationRequest,
+        );
       }
       const response = await generateResumeEdits(token, returnedApplication.id);
       console.log(response);

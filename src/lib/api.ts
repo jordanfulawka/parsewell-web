@@ -135,7 +135,7 @@ async function createApplication(token: string, application: Application) {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ application }),
+      body: JSON.stringify(application),
     },
   );
   if (!response.ok) {
@@ -213,6 +213,25 @@ async function getEditSuggestions(token: string, applicationId: string) {
   return response.json();
 }
 
+async function createApplicationRequest(token: string, jobInformation: any) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/create-request`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(jobInformation),
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
 export {
   login,
   register,
@@ -226,6 +245,7 @@ export {
   updateApplication,
   getEditSuggestions,
   getApplications,
+  createApplicationRequest,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

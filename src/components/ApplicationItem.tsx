@@ -12,7 +12,7 @@ function parseDate(raw: string) {
 
 function ApplicationItem({ application }: { application: Application }) {
   return (
-    <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-6 flex items-center justify-between'>
+    <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-6 flex items-center justify-between hover:border-tertiary-text'>
       <div className='flex flex-col'>
         <span className='text-xl font-bold'>{application.companyName}</span>
         <span className='text-secondary-text'>
@@ -21,7 +21,7 @@ function ApplicationItem({ application }: { application: Application }) {
       </div>
       <div className='flex items-center gap-4'>
         <span className='text-secondary-text text-sm'>
-          {application.updatedAt ? parseDate(application?.updatedAt) : ''}
+          {application.createdAt ? parseDate(application?.createdAt) : ''}
         </span>
         <ApplicationStatusBadge status={application.applicationStatus} />
       </div>
