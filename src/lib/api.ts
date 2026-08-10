@@ -52,9 +52,29 @@ async function getBaseResume(token: string) {
   return response.json();
 }
 
-async function getPresignedPutUrl(token: string) {
+async function getBaseResumePresignedPutUrl(token: string) {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/resumes/base/upload-url`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.text();
+}
+
+async function getFinalMaterialPresignedPutUrl(
+  token: string,
+  applicationId: string,
+  type: string,
+) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/materials/upload-url?type=${type}`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -85,11 +105,56 @@ async function getApplications(token: string) {
 }
 
 async function uploadBaseResume(token: string, fileName: string) {
-  console.log(JSON.stringify({ fileName }));
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/resumes/me`,
     {
       method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fileName }),
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
+async function uploadResume(
+  token: string,
+  applicationId: string,
+  fileName: string,
+) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/upload-resume`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ fileName }),
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
+async function uploadCoverLetter(
+  token: string,
+  applicationId: string,
+  fileName: string,
+) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/upload-cover-letter`,
+    {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -267,7 +332,7 @@ export {
   login,
   register,
   getBaseResume,
-  getPresignedPutUrl,
+  getBaseResumePresignedPutUrl,
   uploadBaseResume,
   parseJobUrlAndGenerateDraftApplication,
   getApplicationById,
@@ -279,6 +344,9 @@ export {
   createApplicationRequest,
   generateCoverLetter,
   getCoverLetter,
+  getFinalMaterialPresignedPutUrl,
+  uploadResume,
+  uploadCoverLetter,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

@@ -4,7 +4,7 @@ import type { Application, BaseResume } from '../lib/types';
 import {
   getApplications,
   getBaseResume,
-  getPresignedPutUrl,
+  getBaseResumePresignedPutUrl,
   uploadBaseResume,
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
@@ -58,7 +58,7 @@ function Applications() {
     e.preventDefault();
     if (!token) return;
     try {
-      const presignedUrl = await getPresignedPutUrl(token);
+      const presignedUrl = await getBaseResumePresignedPutUrl(token);
       if (e.target.files) {
         const file = e.target.files[0];
         await fetch(presignedUrl, {

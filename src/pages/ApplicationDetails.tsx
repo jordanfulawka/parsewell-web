@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ChangeEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
 import {
@@ -6,9 +6,12 @@ import {
   getApplicationById,
   getCoverLetter,
   getEditSuggestions,
+  getFinalMaterialPresignedPutUrl,
   updateApplication,
+  uploadCoverLetter,
+  uploadResume,
 } from '../lib/api';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Upload } from 'lucide-react';
 import type { Application, EditSuggestion } from '../lib/types';
 import EditSuggestionItem from '../components/EditSuggestionItem';
 
@@ -26,6 +29,7 @@ function ApplicationDetails() {
   const [editSuggestions, setEditSuggestions] = useState<EditSuggestion[]>([]);
   const [coverLetter, setCoverLetter] = useState('');
   const [showJobDescription, setShowJobDescription] = useState(false);
+  const [resume, setResume] = useState<File | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -96,6 +100,50 @@ function ApplicationDetails() {
       navigate(`/applications/${params.id}/cover-letter`);
     } catch (err) {
       console.log(err);
+    }
+  }
+
+  async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
+    e.preventDefault();
+    if (!token) return;
+    if (typeof params.id !== 'string') return;
+    if (e.target.files) {
+      const file = e.target.files[0];
+      if (e.target.id === 'coverLetterUpload') {
+        const presignedUrl = await getFinalMaterialPresignedPutUrl(
+          token,
+          params.id,
+          'coverLetter',
+        );
+        await fetch(presignedUrl, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
+        const uploadedCoverLetter = await uploadCoverLetter(
+          token,
+          params.id,
+          file.name,
+        );
+        console.log(uploadCoverLetter);
+      } else if (e.target.id === 'resumeUpload') {
+        const presignedUrl = await getFinalMaterialPresignedPutUrl(
+          token,
+          params.id,
+          'resume',
+        );
+        await fetch(presignedUrl, {
+          method: 'PUT',
+          body: file,
+          headers: {
+            'Content-Type': file.type,
+          },
+        });
+        const uploadedResume = await uploadResume(token, params.id, file.name);
+        console.log(uploadResume);
+      }
     }
   }
 
@@ -210,6 +258,49 @@ function ApplicationDetails() {
               Generate cover letter
             </button>
           )}
+        </div>
+        <div>
+          <h3 className='text-xl font-bold'>Submitted Materials</h3>
+          <p className='text-secondary-text'>
+            Attach the files you applied with, so you always know which version
+            went out.
+          </p>
+          <div className='flex gap-5 mt-2'>
+            <div className='flex-1 bg-[#FDFBF8] border border-subtle-border border-dashed p-5 flex flex-col gap-3 rounded-xl'>
+              <span className='text-primary-text font-bold text-sm'>
+                Resume Sent
+              </span>
+              <label
+                className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
+                htmlFor='resumeUpload'
+              >
+                <Upload size={16} /> Attach resume
+                <input
+                  type='file'
+                  className='hidden'
+                  id='resumeUpload'
+                  onChange={handleUpload}
+                />
+              </label>
+            </div>
+            <div className='flex-1 bg-[#FDFBF8] border border-subtle-border border-dashed p-5 flex flex-col gap-3 rounded-xl'>
+              <span className='text-primary-text font-bold text-sm'>
+                Cover letter sent
+              </span>
+              <label
+                className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
+                htmlFor='coverLetterUpload'
+              >
+                <Upload size={16} /> Attach cover letter
+                <input
+                  type='file'
+                  className='hidden'
+                  id='coverLetterUpload'
+                  onChange={handleUpload}
+                />
+              </label>
+            </div>
+          </div>
         </div>
       </div>
     </div>
