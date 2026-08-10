@@ -10,16 +10,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router';
 import ApplicationItem from '../components/ApplicationItem';
-
-function parseDate(raw: string) {
-  const truncated = raw.replace(/(\.\d{3})\d+$/, '$1');
-
-  return new Date(truncated).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
+import { parseDate } from '../lib/utils';
 
 function Applications() {
   const [baseResume, setBaseResume] = useState<BaseResume | null>(null);
@@ -102,8 +93,13 @@ function Applications() {
                     Resume successfully uploaded!
                   </span>
                   <span className='text-secondary-text text-sm'>
-                    Uploaded {parseDate(baseResume.createdAt)} ∙{' '}
-                    {baseResume.fileName}
+                    Uploaded{' '}
+                    {parseDate(baseResume.createdAt, {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}{' '}
+                    ∙ {baseResume.fileName}
                   </span>
                 </div>
               </div>

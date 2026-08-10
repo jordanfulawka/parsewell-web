@@ -1,14 +1,6 @@
 import type { Application } from '../lib/types';
 import ApplicationStatusBadge from './ApplicationStatusBadge';
-
-function parseDate(raw: string) {
-  const truncated = raw.replace(/(\.\d{3})\d+$/, '$1');
-
-  return new Date(truncated).toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-  });
-}
+import { parseDate } from '../lib/utils';
 
 function ApplicationItem({ application }: { application: Application }) {
   return (
@@ -21,7 +13,12 @@ function ApplicationItem({ application }: { application: Application }) {
       </div>
       <div className='flex items-center gap-4'>
         <span className='text-secondary-text text-sm'>
-          {application.createdAt ? parseDate(application?.createdAt) : ''}
+          {application.createdAt
+            ? parseDate(application?.createdAt, {
+                month: 'short',
+                day: 'numeric',
+              })
+            : ''}
         </span>
         <ApplicationStatusBadge status={application.applicationStatus} />
       </div>
