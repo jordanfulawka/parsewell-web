@@ -40,6 +40,10 @@ interface EditSuggestion {
   orderIndex: number;
 }
 
+interface CoverLetter {
+  content: string;
+}
+
 type ApplicationStatus =
   | 'APPLIED'
   | 'HEARD_BACK'
@@ -54,4 +58,5 @@ export type {
   Application,
   EditSuggestion,
   ApplicationStatus,
+  CoverLetter,
 };

@@ -181,9 +181,40 @@ async function getApplicationById(token: string, applicationId: string) {
 }
 
 async function generateResumeEdits(token: string, applicationId: string) {
-  console.log('in the api function');
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/generate-edits`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
+async function generateCoverLetter(token: string, applicationId: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/generate-cover-letter`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
+async function getCoverLetter(token: string, applicationId: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/cover-letter`,
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -246,6 +277,8 @@ export {
   getEditSuggestions,
   getApplications,
   createApplicationRequest,
+  generateCoverLetter,
+  getCoverLetter,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

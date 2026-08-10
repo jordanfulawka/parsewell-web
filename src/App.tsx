@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import AddApplication from './pages/AddApplication';
 import ApplicationReview from './pages/ApplicationReview';
 import ApplicationDetails from './pages/ApplicationDetails';
+import CoverLetter from './pages/CoverLetter';
 
 function App() {
   return (
@@ -22,6 +23,10 @@ function App() {
               element={<ApplicationReview />}
             />
             <Route path='/applications/:id' element={<ApplicationDetails />} />
+            <Route
+              path='/applications/:id/cover-letter'
+              element={<CoverLetter />}
+            />
             <Route
               path='/applications/review/:id'
               element={<ApplicationReview />}

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import {
+  generateCoverLetter,
   getApplicationById,
+  getCoverLetter,
   getEditSuggestions,
   updateApplication,
 } from '../lib/api';
@@ -22,12 +24,14 @@ function parseDate(raw: string) {
 function ApplicationDetails() {
   const [application, setApplication] = useState<Application>();
   const [editSuggestions, setEditSuggestions] = useState<EditSuggestion[]>([]);
+  const [coverLetter, setCoverLetter] = useState('');
   const [showJobDescription, setShowJobDescription] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const { token } = useAuth();
   const params = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchApplication() {
@@ -55,8 +59,22 @@ function ApplicationDetails() {
         setLoading(false);
       }
     }
+
+    async function fetchCoverLetter() {
+      try {
+        if (!token) return;
+        if (typeof params.id !== 'string') return;
+        const coverLetter = await getCoverLetter(token, params.id);
+        console.log(coverLetter);
+        setCoverLetter(coverLetter);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
     fetchApplication();
     fetchEditSuggestions();
+    fetchCoverLetter();
   }, [token, params.id]);
 
   async function updateStatus() {
@@ -64,6 +82,18 @@ function ApplicationDetails() {
       if (!token) return;
       if (!application) return;
       await updateApplication(token, application);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function handleCoverLetterGeneration() {
+    try {
+      if (!token) return;
+      if (typeof params.id !== 'string') return;
+      const coverLetter = await generateCoverLetter(token, params.id);
+      console.log(coverLetter);
+      navigate(`/applications/${params.id}/cover-letter`);
     } catch (err) {
       console.log(err);
     }
@@ -161,6 +191,25 @@ function ApplicationDetails() {
               />
             ))}
           </div>
+        </div>
+        <div>
+          {coverLetter ? (
+            <button
+              className='text-[#8A5A3E] px-6 py-3 rounded-xl font-bold border border-[#DDB8A0]'
+              onClick={() =>
+                navigate(`/applications/${params.id}/cover-letter`)
+              }
+            >
+              Show cover letter
+            </button>
+          ) : (
+            <button
+              className='bg-[#BC7F53] text-[#FDFAF7] px-6 py-3 rounded-xl font-bold'
+              onClick={handleCoverLetterGeneration}
+            >
+              Generate cover letter
+            </button>
+          )}
         </div>
       </div>
     </div>
