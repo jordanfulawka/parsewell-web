@@ -16,6 +16,16 @@ export default function useApplication() {
     async function fetchApplication() {
       try {
         if (!token) return;
+        // is application is filled out manually
+        if (!params.id) {
+          setApplication({
+            companyName: '',
+            roleTitle: '',
+            location: '',
+            jobUrl: 'No URL Provided',
+            jobDescription: '',
+          });
+        }
         if (typeof params.id !== 'string') return;
         setIsLoading(true);
         const application = await getApplicationById(token, params.id);
@@ -43,5 +53,5 @@ export default function useApplication() {
     }
   }
 
-  return { application, isLoading, error, updateStatus };
+  return { application, isLoading, error, updateStatus, setApplication };
 }

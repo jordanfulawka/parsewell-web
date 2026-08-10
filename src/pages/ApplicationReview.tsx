@@ -1,50 +1,28 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import {
   createApplication,
   createApplicationRequest,
   generateResumeEdits,
-  getApplicationById,
   updateApplication,
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
-import type { Application } from '../lib/types';
+import useApplication from '../hooks/useApplication';
 
 function ApplicationReview() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [application, setApplication] = useState<Application>({
-    companyName: '',
-    roleTitle: '',
-    location: '',
-    jobUrl: 'No URL Provided',
-    jobDescription: '',
-  });
 
   const params = useParams();
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  useEffect(() => {
-    async function fetchApplication() {
-      try {
-        if (!token) return;
-        if (typeof params.id !== 'string') return;
-        setLoading(true);
-        const application = await getApplicationById(token, params.id);
-        setApplication(application);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        console.log(err);
-        setLoading(false);
-      }
-    }
-
-    if (params.id) {
-      fetchApplication();
-    }
-  }, [token]);
+  const {
+    application,
+    isLoading: applicationIsLoading,
+    error: applicationError,
+    setApplication,
+  } = useApplication();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -109,9 +87,10 @@ function ApplicationReview() {
               placeholder='e.g. Scotiabank, Google, Stripe'
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
               value={application?.companyName}
-              onChange={(e) =>
-                setApplication({ ...application, companyName: e.target.value })
-              }
+              onChange={(e) => {
+                if (!application) return;
+                setApplication({ ...application, companyName: e.target.value });
+              }}
               required
             />
           </div>
@@ -124,9 +103,10 @@ function ApplicationReview() {
               placeholder='e.g. Full Stack Engineer, Data Engineer, Embedded Software Developer'
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
               value={application?.roleTitle}
-              onChange={(e) =>
-                setApplication({ ...application, roleTitle: e.target.value })
-              }
+              onChange={(e) => {
+                if (!application) return;
+                setApplication({ ...application, roleTitle: e.target.value });
+              }}
               required
             />
           </div>
@@ -139,9 +119,10 @@ function ApplicationReview() {
               placeholder='e.g. Toronto, San Francisco, Remote (US)'
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
               value={application?.location}
-              onChange={(e) =>
-                setApplication({ ...application, location: e.target.value })
-              }
+              onChange={(e) => {
+                if (!application) return;
+                setApplication({ ...application, location: e.target.value });
+              }}
               required
             />
           </div>
@@ -154,12 +135,13 @@ function ApplicationReview() {
               rows={7}
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
               value={application?.jobDescription}
-              onChange={(e) =>
+              onChange={(e) => {
+                if (!application) return;
                 setApplication({
                   ...application,
                   jobDescription: e.target.value,
-                })
-              }
+                });
+              }}
               required
             ></textarea>
           </div>
