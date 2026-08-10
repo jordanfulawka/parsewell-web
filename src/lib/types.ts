@@ -23,7 +23,7 @@ interface Application {
   jobUrl?: string;
   jobDescription: string;
   applicationChannel?: string;
-  applicationStatus?: string;
+  applicationStatus: string;
   notes?: string;
   createdAt?: string;
   updatedAt?: string;

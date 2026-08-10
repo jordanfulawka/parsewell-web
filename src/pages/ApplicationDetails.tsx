@@ -127,7 +127,10 @@ function ApplicationDetails() {
         <h2 className='text-xl font-bold'>Resume Edits</h2>
         <div className='flex flex-col gap-3'>
           {editSuggestions.map((editSuggestion: EditSuggestion) => (
-            <EditSuggestionItem editSuggestion={editSuggestion} />
+            <EditSuggestionItem
+              key={editSuggestion.id}
+              editSuggestion={editSuggestion}
+            />
           ))}
         </div>
       </div>

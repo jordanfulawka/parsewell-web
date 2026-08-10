@@ -18,6 +18,7 @@ function ApplicationReview() {
     roleTitle: '',
     location: '',
     jobDescription: '',
+    applicationStatus: 'APPLIED',
   });
 
   const params = useParams();

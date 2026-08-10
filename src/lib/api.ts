@@ -68,6 +68,22 @@ async function getPresignedPutUrl(token: string) {
   return response.text();
 }
 
+async function getApplications(token: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
 async function uploadBaseResume(token: string, fileName: string) {
   console.log(JSON.stringify({ fileName }));
   const response = await fetch(
@@ -209,6 +225,7 @@ export {
   createApplication,
   updateApplication,
   getEditSuggestions,
+  getApplications,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

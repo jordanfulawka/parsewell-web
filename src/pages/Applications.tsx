@@ -1,13 +1,15 @@
 import { Plus, FileText, FileExclamationPoint } from 'lucide-react';
 import { useEffect, useState, type ChangeEvent } from 'react';
-import type { BaseResume } from '../lib/types';
+import type { Application, BaseResume } from '../lib/types';
 import {
+  getApplications,
   getBaseResume,
   getPresignedPutUrl,
   uploadBaseResume,
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router';
+import ApplicationItem from '../components/ApplicationItem';
 
 function parseDate(raw: string) {
   const truncated = raw.replace(/(\.\d{3})\d+$/, '$1');
@@ -21,6 +23,7 @@ function parseDate(raw: string) {
 
 function Applications() {
   const [baseResume, setBaseResume] = useState<BaseResume | null>(null);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [error, setError] = useState('');
 
   const { token } = useAuth();
@@ -35,7 +38,19 @@ function Applications() {
         setError(err.message);
       }
     }
+
+    async function fetchApplications() {
+      if (!token) return;
+      try {
+        const response = await getApplications(token);
+        console.log(response);
+        setApplications(response);
+      } catch (err) {
+        console.log(err);
+      }
+    }
     fetchBaseResume();
+    fetchApplications();
   }, [token]);
 
   async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
@@ -63,7 +78,7 @@ function Applications() {
   }
 
   return (
-    <div className='h-full flex justify-center'>
+    <div className='bg-cream-primary h-full flex justify-center'>
       <div className='flex flex-col gap-10 h-fit w-170 m-10'>
         <div className='flex items-center justify-between w-full'>
           <h1 className='text-3xl font-extrabold'>Applications</h1>
@@ -86,7 +101,7 @@ function Applications() {
                     Resume successfully uploaded!
                   </span>
                   <span className='text-secondary-text text-sm'>
-                    Uploaded {parseDate(baseResume.createdAt)} •{' '}
+                    Uploaded {parseDate(baseResume.createdAt)} ∙{' '}
                     {baseResume.fileName}
                   </span>
                 </div>
@@ -131,6 +146,11 @@ function Applications() {
             </div>
           </div>
         )}
+        <div className='flex flex-col gap-4'>
+          {applications.map((application) => (
+            <ApplicationItem key={application.id} application={application} />
+          ))}
+        </div>
       </div>
     </div>
   );
