@@ -2,8 +2,10 @@ import { Plus, FileText, FileExclamationPoint } from 'lucide-react';
 import { useEffect, useState, type ChangeEvent } from 'react';
 import type { Application, BaseResume } from '../lib/types';
 import {
+  deleteBaseResume,
   getApplications,
   getBaseResume,
+  getBaseResumePresignedGetUrl,
   getBaseResumePresignedPutUrl,
   uploadBaseResume,
 } from '../lib/api';
@@ -11,10 +13,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router';
 import ApplicationItem from '../components/ApplicationItem';
 import { parseDate } from '../lib/utils';
+import FileOptions from '../components/FileOptions';
 
 function Applications() {
   const [baseResume, setBaseResume] = useState<BaseResume | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
+  const [showBaseResumeOptions, setShowBaseResumeOptions] = useState(false);
   const [error, setError] = useState('');
 
   const { token } = useAuth();
@@ -69,6 +73,25 @@ function Applications() {
     }
   }
 
+  async function handleDownload() {
+    try {
+      if (!token || !baseResume) return;
+      const presignedUrl = await getBaseResumePresignedGetUrl(token);
+      const response = await fetch(presignedUrl);
+      if (!response.ok) throw new Error('Failed to download resume');
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = baseResume.fileName;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err);
+      console.log(err);
+    }
+  }
+
   return (
     <div className='bg-cream-primary h-full flex justify-center'>
       <div className='flex flex-col gap-10 h-fit w-170 m-10'>
@@ -105,18 +128,17 @@ function Applications() {
               </div>
             </div>
             <div>
-              <label
+              {/* <label
                 className='border border-subtle-border px-3 py-2.5 rounded-2xl hover:bg-[#ECE3D6]'
                 htmlFor='baseResumeUpload'
-              >
-                <span className='font-semibold'>Replace</span>
-                <input
-                  type='file'
-                  className='hidden'
-                  id='baseResumeUpload'
-                  onChange={handleUpload}
+              > */}
+              <div>
+                {/* <span className='font-semibold'>Replace</span> */}
+                <FileOptions
+                  onReplace={(e) => handleUpload(e)}
+                  onDownload={handleDownload}
                 />
-              </label>
+              </div>
             </div>
           </div>
         ) : (

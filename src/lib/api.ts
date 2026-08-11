@@ -68,6 +68,22 @@ async function getBaseResumePresignedPutUrl(token: string) {
   return response.text();
 }
 
+async function getBaseResumePresignedGetUrl(token: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/resumes/base/download-url`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.text();
+}
+
 async function getFinalMaterialPresignedPutUrl(
   token: string,
   applicationId: string,
@@ -114,6 +130,23 @@ async function uploadBaseResume(token: string, fileName: string) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ fileName }),
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.json();
+}
+
+async function deleteBaseResume(token: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/resumes/me`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     },
   );
   if (!response.ok) {
@@ -364,6 +397,8 @@ export {
   uploadResume,
   uploadCoverLetter,
   getFinalMaterials,
+  getBaseResumePresignedGetUrl,
+  deleteBaseResume,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

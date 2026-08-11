@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
@@ -45,7 +47,7 @@ function ApplicationDetails() {
         const editSuggestions = await getEditSuggestions(token, params.id);
         setEditSuggestions(editSuggestions);
         setLoading(false);
-      } catch (err) {
+      } catch (err: any) {
         setError(err.message);
         console.log(err);
         setLoading(false);
