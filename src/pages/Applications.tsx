@@ -137,6 +137,8 @@ function Applications() {
                 <FileOptions
                   onReplace={(e) => handleUpload(e)}
                   onDownload={handleDownload}
+                  padding={3}
+                  id='baseResumeUpload'
                 />
               </div>
             </div>

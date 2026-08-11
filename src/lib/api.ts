@@ -104,6 +104,26 @@ async function getFinalMaterialPresignedPutUrl(
   return response.text();
 }
 
+async function getFinalMaterialPresignedGetUrl(
+  token: string,
+  applicationId: string,
+  type: string,
+) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/materials/download-url?type=${type}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    const data = await response.json();
+    throw new Error(data.error);
+  }
+  return response.text();
+}
+
 async function getApplications(token: string) {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/applications`,
@@ -399,6 +419,7 @@ export {
   getFinalMaterials,
   getBaseResumePresignedGetUrl,
   deleteBaseResume,
+  getFinalMaterialPresignedGetUrl,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

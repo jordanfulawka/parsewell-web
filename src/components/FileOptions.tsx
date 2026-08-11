@@ -1,18 +1,38 @@
 import { EllipsisVertical, RotateCcw, ArrowDownToLine } from 'lucide-react';
-import { useState, type ChangeEvent } from 'react';
+import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 
 function FileOptions({
   onReplace,
   onDownload,
+  padding,
+  id,
 }: {
   onReplace: (e: ChangeEvent<HTMLInputElement>) => Promise<void>;
   onDownload: () => void;
+  padding: number;
+  id: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleClickOutside(e: MouseEvent) {
+      if (!containerRef.current?.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isOpen]);
+
   return (
-    <div className='relative'>
+    <div className='relative' ref={containerRef}>
       <button
-        className='border border-subtle-border rounded-xl p-3 hover:bg-[#ECE3D6]'
+        className={`border border-subtle-border rounded-xl ${'p-' + padding} hover:bg-[#ECE3D6]`}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <EllipsisVertical />
@@ -22,16 +42,11 @@ function FileOptions({
       >
         <label
           className='w-full text-left px-4 py-2 hover:bg-[#ECE3D6] flex justify-between items-center'
-          htmlFor='baseResumeUpload'
+          htmlFor={id}
         >
           Replace
           <RotateCcw size={16} />
-          <input
-            type='file'
-            className='hidden'
-            id='baseResumeUpload'
-            onChange={onReplace}
-          />
+          <input type='file' className='hidden' id={id} onChange={onReplace} />
         </label>
         <button
           className='w-full text-left px-4 py-2 hover:bg-[#ECE3D6] flex justify-between items-center'

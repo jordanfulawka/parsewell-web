@@ -7,6 +7,7 @@ import {
   generateCoverLetter,
   getCoverLetter,
   getEditSuggestions,
+  getFinalMaterialPresignedGetUrl,
   getFinalMaterialPresignedPutUrl,
   getFinalMaterials,
   uploadCoverLetter,
@@ -17,6 +18,7 @@ import type { EditSuggestion } from '../lib/types';
 import EditSuggestionItem from '../components/EditSuggestionItem';
 import { parseDate } from '../lib/utils';
 import useApplication from '../hooks/useApplication';
+import FileOptions from '../components/FileOptions';
 
 function ApplicationDetails() {
   const [editSuggestions, setEditSuggestions] = useState<EditSuggestion[]>([]);
@@ -100,9 +102,12 @@ function ApplicationDetails() {
     e.preventDefault();
     if (!token) return;
     if (typeof params.id !== 'string') return;
+    console.log('in handle upload');
+    console.log(e.target.files);
     if (e.target.files) {
       const file = e.target.files[0];
       if (e.target.id === 'coverLetterUpload') {
+        console.log('in here too');
         const presignedUrl = await getFinalMaterialPresignedPutUrl(
           token,
           params.id,
@@ -122,6 +127,7 @@ function ApplicationDetails() {
         );
         setUploadedCoverLetter(uploadedCoverLetter.coverLetterFilename);
       } else if (e.target.id === 'resumeUpload') {
+        console.log('resumeeee');
         const presignedUrl = await getFinalMaterialPresignedPutUrl(
           token,
           params.id,
@@ -137,6 +143,29 @@ function ApplicationDetails() {
         const uploadedResume = await uploadResume(token, params.id, file.name);
         setUploadedResume(uploadedResume.resumeFilename);
       }
+    }
+  }
+
+  async function handleDownload(type: string) {
+    try {
+      if (!token || typeof params.id !== 'string') return;
+      const presignedUrl = await getFinalMaterialPresignedGetUrl(
+        token,
+        params.id,
+        type,
+      );
+      const response = await fetch(presignedUrl);
+      if (!response.ok) throw new Error(`Failed to download ${type}`);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = type === 'resume' ? uploadedResume : uploadedCoverLetter;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.log(err);
+      setError(err);
     }
   }
 
@@ -254,7 +283,13 @@ function ApplicationDetails() {
               </span>
               {uploadedResume ? (
                 <div className='flex items-center gap-2 font-bold text-sm text-tertiary-text'>
-                  {uploadedResume}
+                  <div>{uploadedResume}</div>
+                  <FileOptions
+                    padding={1}
+                    onReplace={handleUpload}
+                    onDownload={() => handleDownload('resume')}
+                    id='resumeUpload'
+                  />
                 </div>
               ) : (
                 <label
@@ -276,8 +311,14 @@ function ApplicationDetails() {
                 Cover letter sent
               </span>
               {uploadedCoverLetter ? (
-                <div className='flex items-center gap-2 font-bold text-sm text-tertiary-text'>
-                  {uploadedCoverLetter}
+                <div className='flex items-center justify-between gap-2 font-bold text-sm text-tertiary-text'>
+                  <div>{uploadedCoverLetter}</div>
+                  <FileOptions
+                    padding={1}
+                    onReplace={(e) => handleUpload(e)}
+                    onDownload={() => handleDownload('coverLetter')}
+                    id='coverLetterUpload'
+                  />
                 </div>
               ) : (
                 <label
