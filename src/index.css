@@ -19,6 +19,26 @@
 
   --color-subtle-border: #e4dbcf;
   --color-input-border: #ded4c6;
+
+  --animate-bounce1: loadingBounce 3s infinite ease-in-out;
+  --animate-bounce2: loadingBounce 3s infinite ease-in-out 300ms;
+  --animate-bounce3: loadingBounce 3s infinite ease-in-out 500ms;
+
+  @keyframes loadingBounce {
+    0%,
+    20% {
+      transform: none;
+    }
+    5% {
+      transform: translateY(-15px);
+    }
+    10% {
+      transform: translateY(5px);
+    }
+    15% {
+      transform: translateY(-3px);
+    }
+  }
 }
 
 body {

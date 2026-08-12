@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from 'react-router';
+import { NavLink, Outlet } from 'react-router';
 import { List, ChartNoAxesColumn } from 'lucide-react';
 
 function AppLayout() {

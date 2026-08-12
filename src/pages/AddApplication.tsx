@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { parseJobUrlAndGenerateDraftApplication } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router';
+import Loading from './Loading';
 
 function AddApplication() {
   const [url, setUrl] = useState('');
@@ -25,7 +26,7 @@ function AddApplication() {
   }
 
   if (loading) {
-    return <div>loading!</div>;
+    return <Loading stage='parsingJobUrl' />;
   }
 
   return (

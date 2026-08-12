@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import {
   createApplication,
@@ -8,10 +8,12 @@ import {
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import useApplication from '../hooks/useApplication';
+import { getRandomMessage } from '../lib/loadingMessages';
+import Loading from './Loading';
 
 function ApplicationReview() {
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const params = useParams();
   const navigate = useNavigate();
@@ -56,7 +58,7 @@ function ApplicationReview() {
   }
 
   if (loading) {
-    return <div>loading!</div>;
+    return <Loading stage='generatingResumeEdits' />;
   }
 
   return (

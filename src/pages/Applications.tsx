@@ -128,12 +128,7 @@ function Applications() {
               </div>
             </div>
             <div>
-              {/* <label
-                className='border border-subtle-border px-3 py-2.5 rounded-2xl hover:bg-[#ECE3D6]'
-                htmlFor='baseResumeUpload'
-              > */}
               <div>
-                {/* <span className='font-semibold'>Replace</span> */}
                 <FileOptions
                   onReplace={(e) => handleUpload(e)}
                   onDownload={handleDownload}

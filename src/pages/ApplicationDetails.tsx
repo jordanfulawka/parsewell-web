@@ -91,58 +91,59 @@ function ApplicationDetails() {
       if (!token) return;
       if (typeof params.id !== 'string') return;
       const coverLetter = await generateCoverLetter(token, params.id);
-      console.log(coverLetter);
       navigate(`/applications/${params.id}/cover-letter`);
-    } catch (err) {
-      console.log(err);
-    }
+    } catch (err) {}
   }
 
   async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
     if (!token) return;
     if (typeof params.id !== 'string') return;
-    console.log('in handle upload');
-    console.log(e.target.files);
-    if (e.target.files) {
-      const file = e.target.files[0];
-      if (e.target.id === 'coverLetterUpload') {
-        console.log('in here too');
-        const presignedUrl = await getFinalMaterialPresignedPutUrl(
-          token,
-          params.id,
-          'coverLetter',
-        );
-        await fetch(presignedUrl, {
-          method: 'PUT',
-          body: file,
-          headers: {
-            'Content-Type': file.type,
-          },
-        });
-        const uploadedCoverLetter = await uploadCoverLetter(
-          token,
-          params.id,
-          file.name,
-        );
-        setUploadedCoverLetter(uploadedCoverLetter.coverLetterFilename);
-      } else if (e.target.id === 'resumeUpload') {
-        console.log('resumeeee');
-        const presignedUrl = await getFinalMaterialPresignedPutUrl(
-          token,
-          params.id,
-          'resume',
-        );
-        await fetch(presignedUrl, {
-          method: 'PUT',
-          body: file,
-          headers: {
-            'Content-Type': file.type,
-          },
-        });
-        const uploadedResume = await uploadResume(token, params.id, file.name);
-        setUploadedResume(uploadedResume.resumeFilename);
+    try {
+      if (e.target.files) {
+        const file = e.target.files[0];
+        if (e.target.id === 'coverLetterUpload') {
+          const presignedUrl = await getFinalMaterialPresignedPutUrl(
+            token,
+            params.id,
+            'coverLetter',
+          );
+          await fetch(presignedUrl, {
+            method: 'PUT',
+            body: file,
+            headers: {
+              'Content-Type': file.type,
+            },
+          });
+          const uploadedCoverLetter = await uploadCoverLetter(
+            token,
+            params.id,
+            file.name,
+          );
+          setUploadedCoverLetter(uploadedCoverLetter.coverLetterFilename);
+        } else if (e.target.id === 'resumeUpload') {
+          const presignedUrl = await getFinalMaterialPresignedPutUrl(
+            token,
+            params.id,
+            'resume',
+          );
+          await fetch(presignedUrl, {
+            method: 'PUT',
+            body: file,
+            headers: {
+              'Content-Type': file.type,
+            },
+          });
+          const uploadedResume = await uploadResume(
+            token,
+            params.id,
+            file.name,
+          );
+          setUploadedResume(uploadedResume.resumeFilename);
+        }
       }
+    } catch {
+      setError('There was an error uploading this file');
     }
   }
 
@@ -163,9 +164,8 @@ function ApplicationDetails() {
       a.download = type === 'resume' ? uploadedResume : uploadedCoverLetter;
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err) {
-      console.log(err);
-      setError(err);
+    } catch {
+      setError('There was an issue downloading this file');
     }
   }
 
@@ -282,7 +282,7 @@ function ApplicationDetails() {
                 Resume Sent
               </span>
               {uploadedResume ? (
-                <div className='flex items-center gap-2 font-bold text-sm text-tertiary-text'>
+                <div className='flex items-center justify-between gap-2 font-bold text-sm text-tertiary-text'>
                   <div>{uploadedResume}</div>
                   <FileOptions
                     padding={1}
