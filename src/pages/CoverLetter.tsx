@@ -3,10 +3,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
 import { getApplicationById, getCoverLetter } from '../lib/api';
 import type { Application, CoverLetter } from '../lib/types';
+import { getErrorMessage } from '../lib/utils';
+import ErrorBanner from '../components/ErrorBanner';
 
 function CoverLetter() {
   const [coverLetter, setCoverLetter] = useState<CoverLetter | null>(null);
   const [application, setApplication] = useState<Application | null>(null);
+  const [error, setError] = useState('');
 
   const { token } = useAuth();
   const params = useParams();
@@ -20,7 +23,7 @@ function CoverLetter() {
         const application = await getApplicationById(token, params.id);
         setApplication(application);
       } catch (err) {
-        console.log(err);
+        setError(getErrorMessage(err, 'Failed to load application'));
       }
     }
 
@@ -29,10 +32,9 @@ function CoverLetter() {
         if (!token) return;
         if (typeof params.id !== 'string') return;
         const coverLetter = await getCoverLetter(token, params.id);
-        console.log(coverLetter);
         setCoverLetter(coverLetter);
       } catch (err) {
-        console.log(err);
+        setError(getErrorMessage(err, 'Failed to load cover letter'));
       }
     }
 
@@ -43,6 +45,7 @@ function CoverLetter() {
   return (
     <div className='flex justify-center bg-cream-primary'>
       <div className=' p-10 flex flex-col gap-8 w-200'>
+        <ErrorBanner message={error} onDismiss={() => setError('')} />
         <div className='flex flex-col'>
           <span className='text-2xl font-bold'>Cover Letter</span>
           <span className='text-secondary-text'>

@@ -3,6 +3,7 @@ import type { Application } from '../lib/types';
 import { useAuth } from '../contexts/AuthContext';
 import { useParams } from 'react-router';
 import { getApplicationById, updateApplication } from '../lib/api';
+import { getErrorMessage } from '../lib/utils';
 
 export default function useApplication() {
   const [application, setApplication] = useState<Application | null>(null);
@@ -30,8 +31,8 @@ export default function useApplication() {
         setIsLoading(true);
         const application = await getApplicationById(token, params.id);
         setApplication(application);
-      } catch (err: any) {
-        setError(err);
+      } catch (err) {
+        setError(getErrorMessage(err, 'Failed to load application'));
       } finally {
         setIsLoading(false);
       }
@@ -47,8 +48,9 @@ export default function useApplication() {
       const updated = { ...application, applicationStatus: status };
       setApplication(updated);
       await updateApplication(token, updated);
-    } catch (err: any) {
-      setError(err);
+      setError('');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to update application status'));
       setApplication({ ...application, applicationStatus: oldStatus });
     }
   }

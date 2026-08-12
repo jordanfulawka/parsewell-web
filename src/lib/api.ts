@@ -1,5 +1,16 @@
 import type { Application } from './types';
 
+async function getErrorMessage(response: Response): Promise<string> {
+  try {
+    const data = await response.json();
+    console.log(data);
+    if (data?.error) return data.error;
+  } catch {
+    // response body wasn't JSON (e.g. proxy/HTML error page, empty body)
+  }
+  return `Request failed (${response.status} ${response.statusText})`;
+}
+
 async function login(email: string, password: string) {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/auth/signin`,
@@ -12,8 +23,7 @@ async function login(email: string, password: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -29,9 +39,9 @@ async function register(name: string, email: string, password: string) {
       body: JSON.stringify({ firstName: name, email, password }),
     },
   );
+  console.log(response);
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -46,8 +56,7 @@ async function getBaseResume(token: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -62,8 +71,7 @@ async function getBaseResumePresignedPutUrl(token: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.text();
 }
@@ -78,8 +86,7 @@ async function getBaseResumePresignedGetUrl(token: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.text();
 }
@@ -98,8 +105,7 @@ async function getFinalMaterialPresignedPutUrl(
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.text();
 }
@@ -118,8 +124,7 @@ async function getFinalMaterialPresignedGetUrl(
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.text();
 }
@@ -134,8 +139,7 @@ async function getApplications(token: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -153,8 +157,7 @@ async function uploadBaseResume(token: string, fileName: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -170,8 +173,7 @@ async function deleteBaseResume(token: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -193,8 +195,7 @@ async function uploadResume(
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -216,8 +217,7 @@ async function uploadCoverLetter(
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -238,8 +238,7 @@ async function parseJobUrlAndGenerateDraftApplication(
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -257,8 +256,7 @@ async function createApplication(token: string, application: Application) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -276,8 +274,7 @@ async function updateApplication(token: string, application: Application) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -292,8 +289,7 @@ async function getApplicationById(token: string, applicationId: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -308,8 +304,7 @@ async function generateResumeEdits(token: string, applicationId: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -324,8 +319,7 @@ async function generateCoverLetter(token: string, applicationId: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -340,8 +334,7 @@ async function getCoverLetter(token: string, applicationId: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -356,8 +349,7 @@ async function getEditSuggestions(token: string, applicationId: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -375,8 +367,7 @@ async function createApplicationRequest(token: string, jobInformation: any) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }
@@ -391,8 +382,7 @@ async function getFinalMaterials(token: string, applicationId: string) {
     },
   );
   if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error);
+    throw new Error(await getErrorMessage(response));
   }
   return response.json();
 }

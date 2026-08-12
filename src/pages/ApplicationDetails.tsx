@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
@@ -19,6 +17,8 @@ import EditSuggestionItem from '../components/EditSuggestionItem';
 import { parseDate } from '../lib/utils';
 import useApplication from '../hooks/useApplication';
 import FileOptions from '../components/FileOptions';
+import ErrorBanner from '../components/ErrorBanner';
+import { getErrorMessage } from '../lib/utils';
 
 function ApplicationDetails() {
   const [editSuggestions, setEditSuggestions] = useState<EditSuggestion[]>([]);
@@ -49,9 +49,8 @@ function ApplicationDetails() {
         const editSuggestions = await getEditSuggestions(token, params.id);
         setEditSuggestions(editSuggestions);
         setLoading(false);
-      } catch (err: any) {
-        setError(err.message);
-        console.log(err);
+      } catch (err) {
+        setError(getErrorMessage(err, 'Failed to load resume edit suggestions'));
         setLoading(false);
       }
     }
@@ -61,10 +60,9 @@ function ApplicationDetails() {
         if (!token) return;
         if (typeof params.id !== 'string') return;
         const coverLetter = await getCoverLetter(token, params.id);
-        console.log(coverLetter);
         setCoverLetter(coverLetter);
-      } catch (err) {
-        console.log(err);
+      } catch {
+        // no cover letter generated yet — not an error state
       }
     }
 
@@ -73,11 +71,10 @@ function ApplicationDetails() {
         if (!token) return;
         if (typeof params.id !== 'string') return;
         const finalMaterials = await getFinalMaterials(token, params.id);
-        console.log(finalMaterials);
         setUploadedCoverLetter(finalMaterials.coverLetterFilename);
         setUploadedResume(finalMaterials.resumeFilename);
-      } catch (err) {
-        console.log(err);
+      } catch {
+        // no submitted materials yet — not an error state
       }
     }
 
@@ -90,9 +87,11 @@ function ApplicationDetails() {
     try {
       if (!token) return;
       if (typeof params.id !== 'string') return;
-      const coverLetter = await generateCoverLetter(token, params.id);
+      await generateCoverLetter(token, params.id);
       navigate(`/applications/${params.id}/cover-letter`);
-    } catch (err) {}
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to generate cover letter'));
+    }
   }
 
   async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
@@ -108,42 +107,47 @@ function ApplicationDetails() {
             params.id,
             'coverLetter',
           );
-          await fetch(presignedUrl, {
+          const uploadResponse = await fetch(presignedUrl, {
             method: 'PUT',
             body: file,
             headers: {
               'Content-Type': file.type,
             },
           });
+          if (!uploadResponse.ok)
+            throw new Error('Failed to upload cover letter');
           const uploadedCoverLetter = await uploadCoverLetter(
             token,
             params.id,
             file.name,
           );
           setUploadedCoverLetter(uploadedCoverLetter.coverLetterFilename);
+          setError('');
         } else if (e.target.id === 'resumeUpload') {
           const presignedUrl = await getFinalMaterialPresignedPutUrl(
             token,
             params.id,
             'resume',
           );
-          await fetch(presignedUrl, {
+          const uploadResponse = await fetch(presignedUrl, {
             method: 'PUT',
             body: file,
             headers: {
               'Content-Type': file.type,
             },
           });
+          if (!uploadResponse.ok) throw new Error('Failed to upload resume');
           const uploadedResume = await uploadResume(
             token,
             params.id,
             file.name,
           );
           setUploadedResume(uploadedResume.resumeFilename);
+          setError('');
         }
       }
-    } catch {
-      setError('There was an error uploading this file');
+    } catch (err) {
+      setError(getErrorMessage(err, 'There was an error uploading this file'));
     }
   }
 
@@ -164,14 +168,20 @@ function ApplicationDetails() {
       a.download = type === 'resume' ? uploadedResume : uploadedCoverLetter;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      setError('There was an issue downloading this file');
+    } catch (err) {
+      setError(
+        getErrorMessage(err, 'There was an issue downloading this file'),
+      );
     }
   }
 
   return (
     <div className='flex justify-center bg-cream-primary'>
       <div className=' p-10 flex flex-col gap-8 w-200'>
+        <ErrorBanner
+          message={applicationError || error}
+          onDismiss={() => setError('')}
+        />
         <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5'>
           <div className='flex flex-col gap-2'>
             <div className='text-2xl font-bold'>{application?.companyName}</div>

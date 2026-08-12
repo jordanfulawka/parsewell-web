@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { login as apiLogin, register } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router';
+import { getErrorMessage } from '../lib/utils';
+import ErrorBanner from '../components/ErrorBanner';
 
 function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -9,29 +11,29 @@ function LoginPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
   const { login } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setError('');
     if (mode === 'signin') {
       try {
         const response = await apiLogin(email, password);
-        console.log(response);
         login(response.token);
         navigate('/applications');
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        setError(getErrorMessage(err, 'Failed to sign in'));
       }
     } else {
       try {
         const response = await register(name, email, password);
-        console.log(response);
         login(response.token);
         navigate('/applications');
-      } catch (e) {
-        console.error(e);
+      } catch (err) {
+        setError(getErrorMessage(err, 'Failed to create account'));
       }
     }
   }
@@ -45,6 +47,7 @@ function LoginPage() {
               <h2 className='text-2xl font-bold'>Parsewell</h2>
               <p className='text-secondary-text'>Sign into your account</p>
             </div>
+            <ErrorBanner message={error} onDismiss={() => setError('')} />
             <form
               className='flex flex-col w-full gap-4'
               onSubmit={handleSubmit}
@@ -73,7 +76,10 @@ function LoginPage() {
               Don't have an account?{' '}
               <button
                 className='text-[#345F3E] underline'
-                onClick={() => setMode('signup')}
+                onClick={() => {
+                  setError('');
+                  setMode('signup');
+                }}
               >
                 Sign up
               </button>
@@ -86,6 +92,7 @@ function LoginPage() {
               <h2 className='text-2xl font-bold'>Parsewell</h2>
               <p className='text-secondary-text'>Sign into your account</p>
             </div>
+            <ErrorBanner message={error} onDismiss={() => setError('')} />
             <form
               className='flex flex-col w-full gap-4'
               onSubmit={handleSubmit}
@@ -122,7 +129,10 @@ function LoginPage() {
               Already have an account?{' '}
               <button
                 className='text-[#345F3E] underline'
-                onClick={() => setMode('signin')}
+                onClick={() => {
+                  setError('');
+                  setMode('signin');
+                }}
               >
                 Sign in
               </button>

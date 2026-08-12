@@ -12,8 +12,9 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router';
 import ApplicationItem from '../components/ApplicationItem';
-import { parseDate } from '../lib/utils';
+import { getErrorMessage, parseDate } from '../lib/utils';
 import FileOptions from '../components/FileOptions';
+import ErrorBanner from '../components/ErrorBanner';
 
 function Applications() {
   const [baseResume, setBaseResume] = useState<BaseResume | null>(null);
@@ -30,8 +31,8 @@ function Applications() {
       try {
         const baseResume = await getBaseResume(token);
         setBaseResume(baseResume);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        setError(getErrorMessage(err, 'Failed to load your base resume'));
       }
     }
 
@@ -39,10 +40,9 @@ function Applications() {
       if (!token) return;
       try {
         const response = await getApplications(token);
-        console.log(response);
         setApplications(response);
       } catch (err) {
-        console.log(err);
+        setError(getErrorMessage(err, 'Failed to load your applications'));
       }
     }
     fetchBaseResume();
@@ -56,20 +56,20 @@ function Applications() {
       const presignedUrl = await getBaseResumePresignedPutUrl(token);
       if (e.target.files) {
         const file = e.target.files[0];
-        await fetch(presignedUrl, {
+        const uploadResponse = await fetch(presignedUrl, {
           method: 'PUT',
           body: file,
           headers: {
             'Content-Type': file.type,
           },
         });
+        if (!uploadResponse.ok) throw new Error('Failed to upload resume');
         const baseResume = await uploadBaseResume(token, file.name);
-        console.log(baseResume);
         setBaseResume(baseResume);
+        setError('');
       }
-    } catch (err: any) {
-      setError(err.message);
-      console.log(err);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to upload resume'));
     }
   }
 
@@ -87,8 +87,7 @@ function Applications() {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err);
-      console.log(err);
+      setError(getErrorMessage(err, 'Failed to download resume'));
     }
   }
 
@@ -104,6 +103,7 @@ function Applications() {
             <Plus /> New Application
           </Link>
         </div>
+        <ErrorBanner message={error} onDismiss={() => setError('')} />
         {baseResume ? (
           <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
             <div>

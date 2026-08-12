@@ -1,5 +1,5 @@
 import { useEffect, useState, type FormEvent } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
 import {
   createApplication,
   createApplicationRequest,
@@ -13,11 +13,12 @@ import Loading from './Loading';
 
 function ApplicationReview() {
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const params = useParams();
   const navigate = useNavigate();
   const { token } = useAuth();
+  const [searchParams] = useSearchParams();
 
   const {
     application,
@@ -75,7 +76,13 @@ function ApplicationReview() {
           <div className='flex flex-col gap-1'>
             <h2 className='text-2xl font-bold'>Enter the details</h2>
             <p className='text-secondary-text'>
-              Put the job information here. Double check befor submission
+              {searchParams.get('error') ? (
+                <span className='text-red-800'>
+                  Unable to fetch job posting information. Please enter manually
+                </span>
+              ) : (
+                'Please enter posting information here.'
+              )}
             </p>
           </div>
         )}

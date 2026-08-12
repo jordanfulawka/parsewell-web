@@ -3,10 +3,13 @@ import { parseJobUrlAndGenerateDraftApplication } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router';
 import Loading from './Loading';
+import { getErrorMessage } from '../lib/utils';
+import ErrorBanner from '../components/ErrorBanner';
 
 function AddApplication() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { token } = useAuth();
   const navigate = useNavigate();
 
@@ -15,13 +18,13 @@ function AddApplication() {
     try {
       if (!token) return;
       setLoading(true);
+      setError('');
       const response = await parseJobUrlAndGenerateDraftApplication(token, url);
-      setLoading(false);
       navigate(`/applications/review/${response.id}`);
     } catch (err) {
-      console.log(err);
-      console.log('couldnt extract info');
-      navigate('/applications/review');
+      setError(getErrorMessage(err, 'Failed to parse this job posting'));
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -38,6 +41,7 @@ function AddApplication() {
             Paste the job posting link and we'll pull in the details
           </p>
         </div>
+        <ErrorBanner message={error} onDismiss={() => setError('')} />
         <form className='flex flex-col gap-5' onSubmit={handleSubmit}>
           <input
             type='text'
