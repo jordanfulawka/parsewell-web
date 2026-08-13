@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
 import { getApplicationById, getCoverLetter } from '../lib/api';
-import type { Application, CoverLetter } from '../lib/types';
+import type { Application, ReturnedCoverLetter } from '../lib/types';
 import { getErrorMessage } from '../lib/utils';
 import ErrorBanner from '../components/ErrorBanner';
 
 function CoverLetter() {
-  const [coverLetter, setCoverLetter] = useState<CoverLetter | null>(null);
+  const [coverLetter, setCoverLetter] = useState<ReturnedCoverLetter | null>(
+    null,
+  );
   const [application, setApplication] = useState<Application | null>(null);
   const [error, setError] = useState('');
 

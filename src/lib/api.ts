@@ -3,7 +3,7 @@ import type { Application } from './types';
 async function getErrorMessage(response: Response): Promise<string> {
   try {
     const data = await response.json();
-    console.log(data);
+    console.log(response);
     if (data?.error) return data.error;
   } catch {
     // response body wasn't JSON (e.g. proxy/HTML error page, empty body)
@@ -42,6 +42,23 @@ async function register(name: string, email: string, password: string) {
   console.log(response);
   if (!response.ok) {
     throw new Error(await getErrorMessage(response));
+  }
+  return response.json();
+}
+
+async function checkTokenValidation(token: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/auth/validate`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token }),
+    },
+  );
+  if (!response.ok) {
+    return { valid: false };
   }
   return response.json();
 }
@@ -410,6 +427,7 @@ export {
   getBaseResumePresignedGetUrl,
   deleteBaseResume,
   getFinalMaterialPresignedGetUrl,
+  checkTokenValidation,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

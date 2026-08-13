@@ -5,6 +5,7 @@ export function parseDate(raw: string, options: Intl.DateTimeFormatOptions) {
 }
 
 export function getErrorMessage(err: unknown, fallback: string): string {
+  console.log(err);
   if (err instanceof Error && err.message) return err.message;
   return fallback;
 }

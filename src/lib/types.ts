@@ -2,6 +2,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  exp: string;
 }
 
 interface BaseResume {
@@ -40,7 +41,7 @@ interface EditSuggestion {
   orderIndex: number;
 }
 
-interface CoverLetter {
+interface ReturnedCoverLetter {
   content: string;
 }
 
@@ -58,5 +59,5 @@ export type {
   Application,
   EditSuggestion,
   ApplicationStatus,
-  CoverLetter,
+  ReturnedCoverLetter,
 };
