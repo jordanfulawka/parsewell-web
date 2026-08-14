@@ -2,7 +2,6 @@ import { Plus, FileText, FileExclamationPoint } from 'lucide-react';
 import { useEffect, useState, type ChangeEvent } from 'react';
 import type { Application, BaseResume } from '../lib/types';
 import {
-  deleteBaseResume,
   getApplications,
   getBaseResume,
   getBaseResumePresignedGetUrl,
@@ -17,46 +16,47 @@ import FileOptions from '../components/FileOptions';
 import ErrorBanner from '../components/ErrorBanner';
 import BaseResumeSkeleton from '../skeletons/BaseResumeSkeleton';
 import ApplicationItemSkeleton from '../skeletons/ApplicationItemSkeleton';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 function Applications() {
-  const [baseResume, setBaseResume] = useState<BaseResume | null>(null);
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [resumeLoading, setResumeLoading] = useState(true);
-  const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [error, setError] = useState('');
 
   const { token } = useAuth();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    async function fetchBaseResume() {
-      if (!token) return;
-      try {
-        setResumeLoading(true);
-        const baseResume = await getBaseResume(token);
-        setBaseResume(baseResume);
-      } catch (err) {
-        setError(getErrorMessage(err, 'Failed to load your base resume'));
-      } finally {
-        setResumeLoading(false);
-      }
-    }
+  const queryClient = useQueryClient();
 
-    async function fetchApplications() {
+  const { data: applications = [], isPending: isApplicationsPending } =
+    useQuery({
+      queryKey: ['applications', token],
+      queryFn: async () => {
+        if (!token) return;
+        const applications = await getApplications(token);
+        return applications;
+      },
+      enabled: !!token,
+    });
+
+  const { data: baseResume, isPending: isBaseResumePending } = useQuery({
+    queryKey: ['baseResume', token],
+    queryFn: async () => {
       if (!token) return;
-      try {
-        setApplicationsLoading(true);
-        const response = await getApplications(token);
-        setApplications(response);
-      } catch (err) {
-        setError(getErrorMessage(err, 'Failed to load your applications'));
-      } finally {
-        setApplicationsLoading(false);
-      }
-    }
-    fetchBaseResume();
-    fetchApplications();
-  }, [token]);
+      const baseResume = await getBaseResume(token);
+      return baseResume;
+    },
+    enabled: !!token,
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (fileName: string) => {
+      if (!token) return;
+      const baseResume = await uploadBaseResume(token, fileName);
+      return baseResume;
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['baseResume', token], data);
+    },
+  });
 
   async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
@@ -73,8 +73,7 @@ function Applications() {
           },
         });
         if (!uploadResponse.ok) throw new Error('Failed to upload resume');
-        const baseResume = await uploadBaseResume(token, file.name);
-        setBaseResume(baseResume);
+        await mutation.mutateAsync(file.name);
         setError('');
       }
     } catch (err) {
@@ -113,7 +112,7 @@ function Applications() {
           </Link>
         </div>
         <ErrorBanner message={error} onDismiss={() => setError('')} />
-        {resumeLoading ? (
+        {isBaseResumePending ? (
           <BaseResumeSkeleton />
         ) : baseResume ? (
           <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
@@ -174,10 +173,10 @@ function Applications() {
           </div>
         )}
         <div className='flex flex-col gap-4'>
-          {applicationsLoading ? (
+          {isApplicationsPending ? (
             <ApplicationItemSkeleton />
           ) : (
-            applications.map((application) => (
+            applications.map((application: Application) => (
               <div
                 onClick={() => navigate(`/applications/${application.id}`)}
                 key={application.id}
