@@ -1,7 +1,15 @@
-import { NavLink, Outlet } from 'react-router';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { List, ChartNoAxesColumn } from 'lucide-react';
+import { useEffect } from 'react';
 
 function AppLayout() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.pathname === '/') navigate('/applications');
+  }, [location.pathname]);
+
   return (
     <div className='h-screen bg-cream-primary flex flex-col'>
       <div className='flex items-center gap-8 p-5 border-2 border-transparent border-b-subtle-border'>
