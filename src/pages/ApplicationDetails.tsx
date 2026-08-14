@@ -21,6 +21,7 @@ import ErrorBanner from '../components/ErrorBanner';
 import { getErrorMessage } from '../lib/utils';
 import ApplicationDetailSkeleton from '../skeletons/ApplicationDetailSkeleton';
 import ResumeEditSkeleton from '../skeletons/ResumeEditSkeleton';
+import Loading from './Loading';
 
 function ApplicationDetails() {
   const [editSuggestions, setEditSuggestions] = useState<EditSuggestion[]>([]);
@@ -28,7 +29,7 @@ function ApplicationDetails() {
   const [showJobDescription, setShowJobDescription] = useState(false);
   const [uploadedResume, setUploadedResume] = useState('');
   const [uploadedCoverLetter, setUploadedCoverLetter] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [coverLetterLoading, setCoverLetterLoading] = useState(false);
   const [editSuggestionLoading, setEditSuggestionLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -92,7 +93,9 @@ function ApplicationDetails() {
     try {
       if (!token) return;
       if (typeof params.id !== 'string') return;
+      setCoverLetterLoading(true);
       await generateCoverLetter(token, params.id);
+      setCoverLetterLoading(false);
       navigate(`/applications/${params.id}/cover-letter`);
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to generate cover letter'));
@@ -180,6 +183,10 @@ function ApplicationDetails() {
     }
   }
 
+  if (coverLetterLoading) {
+    return <Loading stage='generatingCoverLetter' />;
+  }
+
   return (
     <div className='flex justify-center bg-cream-primary'>
       <div className=' p-10 flex flex-col gap-8 w-200'>
@@ -263,7 +270,11 @@ function ApplicationDetails() {
                 <ChevronDown size={16} />
               </button>
             </div>
-            {showJobDescription && <p>{application?.jobDescription}</p>}
+            {showJobDescription && (
+              <p className='whitespace-pre-wrap'>
+                {application?.jobDescription}
+              </p>
+            )}
           </div>
         )}
         {editSuggestionLoading ? (

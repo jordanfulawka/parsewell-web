@@ -54,7 +54,7 @@ function CoverLetter() {
             {application?.roleTitle} at {application?.companyName}
           </span>
         </div>
-        <div className='bg-[#FDFBF8] p-10 border border-input-border rounded-2xl'>
+        <div className='bg-[#FDFBF8] p-10 border border-input-border rounded-2xl whitespace-pre-wrap'>
           {coverLetter?.content}
         </div>
         <div>
