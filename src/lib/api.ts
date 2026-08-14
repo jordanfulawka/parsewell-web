@@ -75,6 +75,9 @@ async function getBaseResume(token: string) {
   if (!response.ok) {
     throw new Error(await getErrorMessage(response));
   }
+  if (response.status == 204) {
+    return null;
+  }
   return response.json();
 }
 
