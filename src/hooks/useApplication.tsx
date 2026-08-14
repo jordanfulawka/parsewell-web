@@ -23,7 +23,7 @@ export default function useApplication() {
             companyName: '',
             roleTitle: '',
             location: '',
-            jobUrl: 'No URL Provided',
+            jobURL: '',
             jobDescription: '',
           });
         }

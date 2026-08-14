@@ -21,7 +21,7 @@ interface Application {
   companyName: string;
   roleTitle: string;
   location: string;
-  jobUrl?: string;
+  jobURL?: string;
   jobDescription: string;
   applicationChannel?: string;
   applicationStatus?: string;

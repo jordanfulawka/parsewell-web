@@ -41,7 +41,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
       const decodedUser = decodeToken(stored);
       setUser(decodedUser);
       clearTimeout(timeoutRef.current);
-      timeoutId = setTimeout(
+      timeoutRef.current = timeoutId = setTimeout(
         () => {
           logout();
         },
@@ -58,7 +58,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     const decodedUser = decodeToken(token);
     setUser(decodeToken(token));
     clearTimeout(timeoutRef.current);
-    setTimeout(
+    timeoutRef.current = setTimeout(
       () => {
         logout();
       },

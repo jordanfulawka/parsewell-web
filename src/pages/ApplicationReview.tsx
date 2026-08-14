@@ -137,11 +137,26 @@ function ApplicationReview() {
           </div>
           <div>
             <label className='font-bold text-primary-text text-sm'>
+              Job Posting URL
+            </label>
+            <input
+              type='text'
+              placeholder='e.g. https://company.com/careers/job-id'
+              className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
+              value={application?.jobURL}
+              onChange={(e) => {
+                if (!application) return;
+                setApplication({ ...application, jobURL: e.target.value });
+              }}
+            />
+          </div>
+          <div>
+            <label className='font-bold text-primary-text text-sm'>
               Job Description
             </label>
             <textarea
               placeholder='Paste the full job description here...'
-              rows={7}
+              rows={5}
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
               value={application?.jobDescription}
               onChange={(e) => {

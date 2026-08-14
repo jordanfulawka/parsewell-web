@@ -11,7 +11,7 @@ import {
   uploadCoverLetter,
   uploadResume,
 } from '../lib/api';
-import { ChevronDown, Upload } from 'lucide-react';
+import { ChevronDown, Upload, ExternalLink } from 'lucide-react';
 import type { EditSuggestion } from '../lib/types';
 import EditSuggestionItem from '../components/EditSuggestionItem';
 import { parseDate } from '../lib/utils';
@@ -50,7 +50,9 @@ function ApplicationDetails() {
         setEditSuggestions(editSuggestions);
         setLoading(false);
       } catch (err) {
-        setError(getErrorMessage(err, 'Failed to load resume edit suggestions'));
+        setError(
+          getErrorMessage(err, 'Failed to load resume edit suggestions'),
+        );
         setLoading(false);
       }
     }
@@ -184,7 +186,14 @@ function ApplicationDetails() {
         />
         <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5'>
           <div className='flex flex-col gap-2'>
-            <div className='text-2xl font-bold'>{application?.companyName}</div>
+            <div className='text-2xl font-bold flex items-center gap-3'>
+              {application?.companyName}{' '}
+              {application?.jobURL && (
+                <a href={application.jobURL} target='_blank'>
+                  <ExternalLink color='#7FA697' />
+                </a>
+              )}
+            </div>
             <div className=''>
               {application?.roleTitle}{' '}
               <span className='text-xs font-light'>•</span>{' '}
