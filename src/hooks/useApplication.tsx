@@ -29,6 +29,7 @@ export default function useApplication() {
         }
         if (typeof params.id !== 'string') return;
         setIsLoading(true);
+        // await new Promise((r) => setTimeout(r, 3000));
         const application = await getApplicationById(token, params.id);
         setApplication(application);
       } catch (err) {
@@ -37,6 +38,7 @@ export default function useApplication() {
         setIsLoading(false);
       }
     }
+
     fetchApplication();
   }, [token, params.id]);
 

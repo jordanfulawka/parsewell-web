@@ -19,6 +19,8 @@ import useApplication from '../hooks/useApplication';
 import FileOptions from '../components/FileOptions';
 import ErrorBanner from '../components/ErrorBanner';
 import { getErrorMessage } from '../lib/utils';
+import ApplicationDetailSkeleton from '../skeletons/ApplicationDetailSkeleton';
+import ResumeEditSkeleton from '../skeletons/ResumeEditSkeleton';
 
 function ApplicationDetails() {
   const [editSuggestions, setEditSuggestions] = useState<EditSuggestion[]>([]);
@@ -26,7 +28,8 @@ function ApplicationDetails() {
   const [showJobDescription, setShowJobDescription] = useState(false);
   const [uploadedResume, setUploadedResume] = useState('');
   const [uploadedCoverLetter, setUploadedCoverLetter] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [editSuggestionLoading, setEditSuggestionLoading] = useState(false);
   const [error, setError] = useState('');
 
   const { token } = useAuth();
@@ -45,10 +48,10 @@ function ApplicationDetails() {
       try {
         if (!token) return;
         if (typeof params.id !== 'string') return;
-        setLoading(true);
+        setEditSuggestionLoading(true);
         const editSuggestions = await getEditSuggestions(token, params.id);
         setEditSuggestions(editSuggestions);
-        setLoading(false);
+        setEditSuggestionLoading(false);
       } catch (err) {
         setError(
           getErrorMessage(err, 'Failed to load resume edit suggestions'),
@@ -184,92 +187,100 @@ function ApplicationDetails() {
           message={applicationError || error}
           onDismiss={() => setError('')}
         />
-        <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5'>
-          <div className='flex flex-col gap-2'>
-            <div className='text-2xl font-bold flex items-center gap-3'>
-              {application?.companyName}{' '}
-              {application?.jobURL && (
-                <a href={application.jobURL} target='_blank'>
-                  <ExternalLink color='#7FA697' />
-                </a>
-              )}
+        {applicationIsLoading ? (
+          <ApplicationDetailSkeleton />
+        ) : (
+          <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5'>
+            <div className='flex flex-col gap-2'>
+              <div className='text-2xl font-bold flex items-center gap-3'>
+                {application?.companyName}{' '}
+                {application?.jobURL && (
+                  <a href={application.jobURL} target='_blank'>
+                    <ExternalLink color='#7FA697' />
+                  </a>
+                )}
+              </div>
+              <div className=''>
+                {application?.roleTitle}{' '}
+                <span className='text-xs font-light'>•</span>{' '}
+                {application?.location}
+              </div>
+              <div className='text-secondary-text'>
+                Applied{' '}
+                {application?.createdAt
+                  ? parseDate(application.createdAt, {
+                      month: 'short',
+                      day: 'numeric',
+                    })
+                  : ''}
+              </div>
             </div>
-            <div className=''>
-              {application?.roleTitle}{' '}
-              <span className='text-xs font-light'>•</span>{' '}
-              {application?.location}
+            <div className='flex gap-4'>
+              <button
+                className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'APPLIED' ? 'bg-[#F0DFC5] text-[#8A5C2C] border-[#8A5C2C]' : 'text-secondary-text border-subtle-border'}`}
+                onClick={() => {
+                  if (!application) return;
+                  updateStatus('APPLIED');
+                }}
+              >
+                <span className='text-sm'>Applied</span>
+              </button>
+              <button
+                className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'HEARD_BACK' ? 'bg-[#DDEBE0] text-[#345F3E] border-[#345F3E]' : 'text-secondary-text border-subtle-border'}`}
+                onClick={() => {
+                  if (!application) return;
+                  updateStatus('HEARD_BACK');
+                }}
+              >
+                <span className='text-sm'>Heard Back</span>
+              </button>
+              <button
+                className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'REJECTED' ? 'bg-[#E8C4B8] text-[#8A3B2E] border-[#8A3B2E]' : 'text-secondary-text border-subtle-border'}`}
+                onClick={() => {
+                  if (!application) return;
+                  updateStatus('REJECTED');
+                }}
+              >
+                <span className='text-sm'>Rejected</span>
+              </button>
+              <button
+                className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'GHOSTED' ? 'bg-[#E3C6BE] text-[#8C4A3D] border-[#8C4A3D]' : 'text-secondary-text border-subtle-border'}`}
+                onClick={() => {
+                  if (!application) return;
+                  updateStatus('GHOSTED');
+                }}
+              >
+                <span className='text-sm'>Ghosted</span>
+              </button>
             </div>
-            <div className='text-secondary-text'>
-              Applied{' '}
-              {application?.createdAt
-                ? parseDate(application.createdAt, {
-                    month: 'short',
-                    day: 'numeric',
-                  })
-                : ''}
+            <div className='bg-tertiary-text/30 h-px' />
+            <div className='flex items-center gap-2'>
+              <h4 className='font-bold text-primary-text'>Job description</h4>
+              <button
+                className={`${showJobDescription ? '' : 'rotate-180'} transition-transform`}
+                onClick={() => setShowJobDescription((prev) => !prev)}
+              >
+                <ChevronDown size={16} />
+              </button>
+            </div>
+            {showJobDescription && <p>{application?.jobDescription}</p>}
+          </div>
+        )}
+        {editSuggestionLoading ? (
+          <ResumeEditSkeleton />
+        ) : (
+          <div>
+            <h2 className='text-xl font-bold'>Resume Edits</h2>
+            <div className='flex flex-col gap-3'>
+              {editSuggestions.map((editSuggestion: EditSuggestion) => (
+                <EditSuggestionItem
+                  key={editSuggestion.id}
+                  editSuggestion={editSuggestion}
+                />
+              ))}
             </div>
           </div>
-          <div className='flex gap-4'>
-            <button
-              className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'APPLIED' ? 'bg-[#F0DFC5] text-[#8A5C2C] border-[#8A5C2C]' : 'text-secondary-text border-subtle-border'}`}
-              onClick={() => {
-                if (!application) return;
-                updateStatus('APPLIED');
-              }}
-            >
-              <span className='text-sm'>Applied</span>
-            </button>
-            <button
-              className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'HEARD_BACK' ? 'bg-[#DDEBE0] text-[#345F3E] border-[#345F3E]' : 'text-secondary-text border-subtle-border'}`}
-              onClick={() => {
-                if (!application) return;
-                updateStatus('HEARD_BACK');
-              }}
-            >
-              <span className='text-sm'>Heard Back</span>
-            </button>
-            <button
-              className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'REJECTED' ? 'bg-[#E8C4B8] text-[#8A3B2E] border-[#8A3B2E]' : 'text-secondary-text border-subtle-border'}`}
-              onClick={() => {
-                if (!application) return;
-                updateStatus('REJECTED');
-              }}
-            >
-              <span className='text-sm'>Rejected</span>
-            </button>
-            <button
-              className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'GHOSTED' ? 'bg-[#E3C6BE] text-[#8C4A3D] border-[#8C4A3D]' : 'text-secondary-text border-subtle-border'}`}
-              onClick={() => {
-                if (!application) return;
-                updateStatus('GHOSTED');
-              }}
-            >
-              <span className='text-sm'>Ghosted</span>
-            </button>
-          </div>
-          <div className='bg-tertiary-text/30 h-px' />
-          <div className='flex items-center gap-2'>
-            <h4 className='font-bold text-primary-text'>Job description</h4>
-            <button
-              className={`${showJobDescription ? '' : 'rotate-180'} transition-transform`}
-              onClick={() => setShowJobDescription((prev) => !prev)}
-            >
-              <ChevronDown size={16} />
-            </button>
-          </div>
-          {showJobDescription && <p>{application?.jobDescription}</p>}
-        </div>
-        <div>
-          <h2 className='text-xl font-bold'>Resume Edits</h2>
-          <div className='flex flex-col gap-3'>
-            {editSuggestions.map((editSuggestion: EditSuggestion) => (
-              <EditSuggestionItem
-                key={editSuggestion.id}
-                editSuggestion={editSuggestion}
-              />
-            ))}
-          </div>
-        </div>
+        )}
         <div>
           {coverLetter ? (
             <button

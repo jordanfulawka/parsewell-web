@@ -15,11 +15,14 @@ import ApplicationItem from '../components/ApplicationItem';
 import { getErrorMessage, parseDate } from '../lib/utils';
 import FileOptions from '../components/FileOptions';
 import ErrorBanner from '../components/ErrorBanner';
+import BaseResumeSkeleton from '../skeletons/BaseResumeSkeleton';
+import ApplicationItemSkeleton from '../skeletons/ApplicationItemSkeleton';
 
 function Applications() {
   const [baseResume, setBaseResume] = useState<BaseResume | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
-  const [showBaseResumeOptions, setShowBaseResumeOptions] = useState(false);
+  const [resumeLoading, setResumeLoading] = useState(true);
+  const [applicationsLoading, setApplicationsLoading] = useState(true);
   const [error, setError] = useState('');
 
   const { token } = useAuth();
@@ -29,20 +32,26 @@ function Applications() {
     async function fetchBaseResume() {
       if (!token) return;
       try {
+        setResumeLoading(true);
         const baseResume = await getBaseResume(token);
         setBaseResume(baseResume);
       } catch (err) {
         setError(getErrorMessage(err, 'Failed to load your base resume'));
+      } finally {
+        setResumeLoading(false);
       }
     }
 
     async function fetchApplications() {
       if (!token) return;
       try {
+        setApplicationsLoading(true);
         const response = await getApplications(token);
         setApplications(response);
       } catch (err) {
         setError(getErrorMessage(err, 'Failed to load your applications'));
+      } finally {
+        setApplicationsLoading(false);
       }
     }
     fetchBaseResume();
@@ -104,7 +113,9 @@ function Applications() {
           </Link>
         </div>
         <ErrorBanner message={error} onDismiss={() => setError('')} />
-        {baseResume ? (
+        {resumeLoading ? (
+          <BaseResumeSkeleton />
+        ) : baseResume ? (
           <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
             <div>
               <div className='flex items-center gap-2'>
@@ -163,14 +174,18 @@ function Applications() {
           </div>
         )}
         <div className='flex flex-col gap-4'>
-          {applications.map((application) => (
-            <div
-              onClick={() => navigate(`/applications/${application.id}`)}
-              key={application.id}
-            >
-              <ApplicationItem application={application} />
-            </div>
-          ))}
+          {applicationsLoading ? (
+            <ApplicationItemSkeleton />
+          ) : (
+            applications.map((application) => (
+              <div
+                onClick={() => navigate(`/applications/${application.id}`)}
+                key={application.id}
+              >
+                <ApplicationItem application={application} />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
