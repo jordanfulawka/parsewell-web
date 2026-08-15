@@ -1,61 +1,75 @@
-import { useEffect, useState } from 'react';
 import type { Application } from '../lib/types';
 import { useAuth } from '../contexts/AuthContext';
 import { useParams } from 'react-router';
 import { getApplicationById, updateApplication } from '../lib/api';
-import { getErrorMessage } from '../lib/utils';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function useApplication() {
-  const [application, setApplication] = useState<Application | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-
   const { token } = useAuth();
   const params = useParams();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    async function fetchApplication() {
-      try {
-        if (!token) return;
-        // is application is filled out manually
-        if (!params.id) {
-          setApplication({
-            companyName: '',
-            roleTitle: '',
-            location: '',
-            jobURL: '',
-            jobDescription: '',
-          });
-        }
-        if (typeof params.id !== 'string') return;
-        setIsLoading(true);
-        // await new Promise((r) => setTimeout(r, 3000));
-        const application = await getApplicationById(token, params.id);
-        setApplication(application);
-      } catch (err) {
-        setError(getErrorMessage(err, 'Failed to load application'));
-      } finally {
-        setIsLoading(false);
-      }
-    }
+  const { data, isPending, isError, error } = useQuery({
+    queryKey: ['application', params.id, token],
+    queryFn: async () => {
+      if (!token) return;
+      if (!params.id) return;
+      const application = await getApplicationById(token, params.id);
+      return application;
+    },
+    enabled: !!token && typeof params.id === 'string',
+  });
 
-    fetchApplication();
-  }, [token, params.id]);
+  const mutation = useMutation({
+    mutationFn: async (updated: Application) => {
+      if (!token) return;
+      return await updateApplication(token, updated);
+    },
 
-  async function updateStatus(status: string) {
-    if (!token) return;
+    onMutate: async (newApplication) => {
+      await queryClient.cancelQueries({
+        queryKey: ['application', params.id, token],
+      });
+      const previousApplication = queryClient.getQueryData([
+        'application',
+        params.id,
+        token,
+      ]);
+      queryClient.setQueryData(
+        ['application', params.id, token],
+        newApplication,
+      );
+      return { previousApplication, newApplication };
+    },
+    onError: (err, newApplication, context) => {
+      queryClient.setQueryData(
+        ['application', params.id, token],
+        context?.previousApplication,
+      );
+    },
+    onSettled: (newApplication) => {
+      queryClient.invalidateQueries({
+        queryKey: ['application', newApplication.id],
+      });
+    },
+  });
+
+  // if user enters job manually
+  const emptyJob = {
+    companyName: '',
+    roleTitle: '',
+    location: '',
+    jobURL: '',
+    jobDescription: '',
+  };
+
+  const application = params.id ? data : emptyJob;
+  const isLoading = params.id ? false : isPending;
+
+  function updateStatus(status: string) {
     if (!application) return;
-    const oldStatus = application.applicationStatus;
-    try {
-      const updated = { ...application, applicationStatus: status };
-      setApplication(updated);
-      await updateApplication(token, updated);
-      setError('');
-    } catch (err) {
-      setError(getErrorMessage(err, 'Failed to update application status'));
-      setApplication({ ...application, applicationStatus: oldStatus });
-    }
+    mutation.mutate({ ...application, applicationStatus: status });
   }
 
-  return { application, isLoading, error, updateStatus, setApplication };
+  return { application, isLoading, isError, error, mutation, updateStatus };
 }

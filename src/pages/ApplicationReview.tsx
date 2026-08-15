@@ -24,7 +24,7 @@ function ApplicationReview() {
     application,
     isLoading: applicationIsLoading,
     error: applicationError,
-    setApplication,
+    mutation,
   } = useApplication();
 
   async function handleSubmit(e: FormEvent) {
@@ -98,7 +98,10 @@ function ApplicationReview() {
               value={application?.companyName}
               onChange={(e) => {
                 if (!application) return;
-                setApplication({ ...application, companyName: e.target.value });
+                mutation.mutate({
+                  ...application,
+                  companyName: e.target.value,
+                });
               }}
               required
             />
@@ -114,7 +117,10 @@ function ApplicationReview() {
               value={application?.roleTitle}
               onChange={(e) => {
                 if (!application) return;
-                setApplication({ ...application, roleTitle: e.target.value });
+                mutation.mutate({
+                  ...application,
+                  roleTitle: e.target.value,
+                });
               }}
               required
             />
@@ -130,7 +136,7 @@ function ApplicationReview() {
               value={application?.location}
               onChange={(e) => {
                 if (!application) return;
-                setApplication({ ...application, location: e.target.value });
+                mutation.mutate({ ...application, location: e.target.value });
               }}
               required
             />
@@ -146,7 +152,7 @@ function ApplicationReview() {
               value={application?.jobURL}
               onChange={(e) => {
                 if (!application) return;
-                setApplication({ ...application, jobURL: e.target.value });
+                mutation.mutate({ ...application, jobURL: e.target.value });
               }}
             />
           </div>
@@ -161,7 +167,7 @@ function ApplicationReview() {
               value={application?.jobDescription}
               onChange={(e) => {
                 if (!application) return;
-                setApplication({
+                mutation.mutate({
                   ...application,
                   jobDescription: e.target.value,
                 });

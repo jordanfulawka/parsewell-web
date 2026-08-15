@@ -4,7 +4,6 @@ import { useNavigate, useParams } from 'react-router';
 import {
   generateCoverLetter,
   getCoverLetter,
-  getEditSuggestions,
   getFinalMaterialPresignedGetUrl,
   getFinalMaterialPresignedPutUrl,
   getFinalMaterials,
