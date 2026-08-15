@@ -3,7 +3,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
 import {
   generateCoverLetter,
-  getCoverLetter,
   getFinalMaterialPresignedGetUrl,
   getFinalMaterialPresignedPutUrl,
   getFinalMaterials,
@@ -21,15 +20,15 @@ import { getErrorMessage } from '../lib/utils';
 import ApplicationDetailSkeleton from '../skeletons/ApplicationDetailSkeleton';
 import ResumeEditSkeleton from '../skeletons/ResumeEditSkeleton';
 import Loading from './Loading';
+import useEditSuggestions from '../hooks/useEditSuggestions';
+import useCoverLetter from '../hooks/useCoverLetter';
 
 function ApplicationDetails() {
-  const [editSuggestions, setEditSuggestions] = useState<EditSuggestion[]>([]);
-  const [coverLetter, setCoverLetter] = useState('');
+  // const [coverLetter, setCoverLetter] = useState('');
   const [showJobDescription, setShowJobDescription] = useState(false);
   const [uploadedResume, setUploadedResume] = useState('');
   const [uploadedCoverLetter, setUploadedCoverLetter] = useState('');
   const [coverLetterLoading, setCoverLetterLoading] = useState(false);
-  const [editSuggestionLoading, setEditSuggestionLoading] = useState(false);
   const [error, setError] = useState('');
 
   const { token } = useAuth();
@@ -43,33 +42,29 @@ function ApplicationDetails() {
     updateStatus,
   } = useApplication();
 
-  useEffect(() => {
-    async function fetchEditSuggestions() {
-      try {
-        if (!token) return;
-        if (typeof params.id !== 'string') return;
-        setEditSuggestionLoading(true);
-        const editSuggestions = await getEditSuggestions(token, params.id);
-        setEditSuggestions(editSuggestions);
-        setEditSuggestionLoading(false);
-      } catch (err) {
-        setError(
-          getErrorMessage(err, 'Failed to load resume edit suggestions'),
-        );
-        setLoading(false);
-      }
-    }
+  const {
+    data: editSuggestions,
+    isPending: editSuggestionsIsLoading,
+    error: editSuggestionsError,
+  } = useEditSuggestions();
 
-    async function fetchCoverLetter() {
-      try {
-        if (!token) return;
-        if (typeof params.id !== 'string') return;
-        const coverLetter = await getCoverLetter(token, params.id);
-        setCoverLetter(coverLetter);
-      } catch {
-        // no cover letter generated yet — not an error state
-      }
-    }
+  const {
+    data: coverLetter,
+    isPending: covereLetterIsLoading,
+    error: coverLetterError,
+  } = useCoverLetter();
+
+  useEffect(() => {
+    // async function fetchCoverLetter() {
+    //   try {
+    //     if (!token) return;
+    //     if (typeof params.id !== 'string') return;
+    //     const coverLetter = await getCoverLetter(token, params.id);
+    //     setCoverLetter(coverLetter);
+    //   } catch {
+    //     // no cover letter generated yet — not an error state
+    //   }
+    // }
 
     async function fetchFinalMaterials() {
       try {
@@ -83,8 +78,8 @@ function ApplicationDetails() {
       }
     }
 
-    fetchEditSuggestions();
-    fetchCoverLetter();
+    // fetchEditSuggestions();
+    // fetchCoverLetter();
     fetchFinalMaterials();
   }, [token, params.id]);
 
@@ -190,7 +185,9 @@ function ApplicationDetails() {
     <div className='flex justify-center bg-cream-primary'>
       <div className=' p-10 flex flex-col gap-8 w-200'>
         <ErrorBanner
-          message={applicationError || error}
+          message={
+            applicationError?.message || editSuggestionsError?.message || error
+          }
           onDismiss={() => setError('')}
         />
         {applicationIsLoading ? (
@@ -276,7 +273,7 @@ function ApplicationDetails() {
             )}
           </div>
         )}
-        {editSuggestionLoading ? (
+        {editSuggestionsIsLoading ? (
           <ResumeEditSkeleton />
         ) : (
           <div>

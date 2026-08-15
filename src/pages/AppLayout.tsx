@@ -12,7 +12,7 @@ function AppLayout() {
 
   return (
     <div className='h-screen bg-cream-primary flex flex-col'>
-      <div className='flex items-center gap-8 p-5 border-2 border-transparent border-b-subtle-border'>
+      <div className='flex  bg-cream-primary z-50 items-center gap-8 p-5 border-2 border-transparent border-b-subtle-border fixed w-full'>
         <h2 className='text-2xl font-bold'>Parsewell</h2>
         <NavLink
           to='/applications'
@@ -37,7 +37,7 @@ function AppLayout() {
           <span className='font-bold'>Insights</span>
         </NavLink>
       </div>
-      <div className='flex-1'>
+      <div className='flex-1 mt-29'>
         <Outlet />
       </div>
     </div>
