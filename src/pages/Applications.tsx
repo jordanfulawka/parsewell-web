@@ -17,6 +17,7 @@ import ErrorBanner from '../components/ErrorBanner';
 import BaseResumeSkeleton from '../skeletons/BaseResumeSkeleton';
 import ApplicationItemSkeleton from '../skeletons/ApplicationItemSkeleton';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import useApplications from '../hooks/useApplications';
 
 function Applications() {
   const [error, setError] = useState('');
@@ -26,16 +27,19 @@ function Applications() {
 
   const queryClient = useQueryClient();
 
-  const { data: applications = [], isPending: isApplicationsPending } =
-    useQuery({
-      queryKey: ['applications', token],
-      queryFn: async () => {
-        if (!token) return;
-        const applications = await getApplications(token);
-        return applications;
-      },
-      enabled: !!token,
-    });
+  // const { data: applications = [], isPending: isApplicationsPending } =
+  //   useQuery({
+  //     queryKey: ['applications', token],
+  //     queryFn: async () => {
+  //       if (!token) return;
+  //       const applications = await getApplications(token);
+  //       return applications;
+  //     },
+  //     enabled: !!token,
+  //   });
+
+  const { data: applications, isPending: isApplicationsPending } =
+    useApplications();
 
   const { data: baseResume, isPending: isBaseResumePending } = useQuery({
     queryKey: ['baseResume', token],
@@ -80,6 +84,8 @@ function Applications() {
       setError(getErrorMessage(err, 'Failed to upload resume'));
     }
   }
+
+  console.log(applications);
 
   async function handleDownload() {
     try {
