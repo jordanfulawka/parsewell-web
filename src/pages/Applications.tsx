@@ -4,11 +4,12 @@ import {
   FileExclamationPoint,
   FileX,
   LoaderCircle,
+  Search,
+  ListSortDescending,
 } from 'lucide-react';
 import { useEffect, useState, type ChangeEvent } from 'react';
 import type { Application, BaseResume } from '../lib/types';
 import {
-  getApplications,
   getBaseResume,
   getBaseResumePresignedGetUrl,
   getBaseResumePresignedPutUrl,
@@ -28,14 +29,22 @@ import useApplications from '../hooks/useApplications';
 function Applications() {
   const [error, setError] = useState('');
   const [isBaseResumeUploading, setIsBaseResumeUploading] = useState(false);
+  const [isSortByMenuOpen, setIsSortByMenuOpen] = useState(false);
 
   const { token } = useAuth();
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
 
-  const { data: applications, isPending: isApplicationsPending } =
-    useApplications();
+  const {
+    data: applications,
+    isPending: isApplicationsPending,
+    searchQuery,
+    setSearchQuery,
+    sortBy,
+    setSortBy,
+    filteredData,
+  } = useApplications();
 
   const { data: baseResume, isPending: isBaseResumePending } = useQuery({
     queryKey: ['baseResume', token],
@@ -103,7 +112,8 @@ function Applications() {
   }
 
   return (
-    <div className='bg-cream-primary h-full flex justify-center'>
+    // might need to change this overflow-y-hidden properly, could cause issues
+    <div className='bg-cream-primary h-full flex justify-center overflow-y-hidden'>
       <div className='flex flex-col gap-10 h-fit w-170 m-10'>
         <div className='flex items-center justify-between w-full'>
           <h1 className='text-3xl font-extrabold'>Applications</h1>
@@ -190,10 +200,64 @@ function Applications() {
           </div>
         )}
         <div className='flex flex-col gap-4'>
+          <div>
+            <div className='flex justify-between gap-4 relative'>
+              <span className='absolute top-4 left-3'>
+                <Search size={16} />
+              </span>
+              <input
+                className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl pl-10 flex-1'
+                placeholder='Search company, role, or location'
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+
+              <div className='relative'>
+                <button
+                  className='border border-input-border rounded-xl text-sm text-secondary-text font-bold px-5 py-3.5 flex items-center gap-2 hover:bg-[#ECE3D6]'
+                  onClick={() => setIsSortByMenuOpen((prev) => !prev)}
+                >
+                  <ListSortDescending size={16} />
+                  {sortBy}
+                </button>
+                {isSortByMenuOpen && (
+                  <div
+                    className='absolute flex flex-col gap-1 top-15 right-0 bg-[#FDFBF8] shadow-lg w-50 rounded-xl text-primary-text p-2'
+                    onClick={() => setIsSortByMenuOpen(false)}
+                  >
+                    <button
+                      className={`p-3 text-left  rounded-xl ${sortBy === 'Recently updated' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                      onClick={() => setSortBy('Recently updated')}
+                    >
+                      Recently updated
+                    </button>
+                    <button
+                      className={`p-3 text-left  rounded-xl ${sortBy === 'Newest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                      onClick={() => setSortBy('Newest first')}
+                    >
+                      Newest first
+                    </button>
+                    <button
+                      className={`p-3 text-left  rounded-xl ${sortBy === 'Oldest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                      onClick={() => setSortBy('Oldest first')}
+                    >
+                      Oldest first
+                    </button>
+                    <button
+                      className={`p-3 text-left  rounded-xl ${sortBy === 'Company A-Z' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                      onClick={() => setSortBy('Company A-Z')}
+                    >
+                      Company A-Z
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
           {isApplicationsPending ? (
             <ApplicationItemSkeleton />
           ) : (
-            applications.map((application: Application) => (
+            filteredData.map((application: Application) => (
               <div
                 onClick={() => navigate(`/applications/${application.id}`)}
                 key={application.id}

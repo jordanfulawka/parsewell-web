@@ -15,7 +15,7 @@ function AppLayout() {
 
   return (
     <div className='h-screen bg-cream-primary flex flex-col'>
-      <div className='flex justify-between bg-cream-primary z-50 items-center gap-8 border-2 border-transparent border-b-subtle-border fixed w-full'>
+      <div className='flex justify-between bg-cream-primary z-50 items-center gap-8 border-2 border-transparent border-b-subtle-border fixed w-full flex-wrap'>
         <div className='flex items-center gap-8 p-5'>
           <h2 className='text-2xl font-bold'>Parsewell</h2>
           <NavLink
