@@ -37,6 +37,7 @@ function Applications() {
   const queryClient = useQueryClient();
 
   const {
+    data: applications,
     isPending: isApplicationsPending,
     searchQuery,
     setSearchQuery,
@@ -116,12 +117,18 @@ function Applications() {
       <div className='flex flex-col gap-10 h-fit w-170 m-10'>
         <div className='flex items-center justify-between w-full'>
           <h1 className='text-3xl font-extrabold'>Applications</h1>
-          <Link
-            className='flex gap-2 bg-[#7FA687] p-3 rounded-2xl text-white font-bold cursor-pointer hover:bg-[#6D9476]'
-            to='/applications/new'
-          >
-            <Plus /> New Application
-          </Link>
+          {baseResume ? (
+            <Link
+              className='flex gap-2 bg-[#7FA687] p-3 rounded-2xl text-white font-bold cursor-pointer hover:bg-[#6D9476]'
+              to='/applications/new'
+            >
+              <Plus /> New Application
+            </Link>
+          ) : (
+            <div className='flex gap-2 bg-[#A9A9A9] p-3 rounded-2xl text-white font-bold cursor-not-allowed'>
+              <Plus /> New Application
+            </div>
+          )}
         </div>
         <ErrorBanner message={error} onDismiss={() => setError('')} />
         {isBaseResumePending ? (
@@ -200,62 +207,70 @@ function Applications() {
         )}
         <div className='flex flex-col gap-4'>
           <div>
-            <div className='flex justify-between gap-4 relative'>
-              <span className='absolute top-4 left-3'>
-                <Search size={16} />
-              </span>
-              <input
-                className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl pl-10 flex-1'
-                placeholder='Search company, role, or location'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+            {applications.length > 0 && (
+              <div className='flex justify-between gap-4 relative'>
+                <span className='absolute top-4 left-3'>
+                  <Search size={16} />
+                </span>
+                <input
+                  className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl pl-10 flex-1'
+                  placeholder='Search company, role, or location'
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
 
-              <div className='relative'>
-                <button
-                  className='border border-input-border rounded-xl text-sm text-secondary-text font-bold px-5 py-3.5 flex items-center gap-2 hover:bg-[#ECE3D6]'
-                  onClick={() => setIsSortByMenuOpen((prev) => !prev)}
-                >
-                  <ListSortDescending size={16} />
-                  {sortBy}
-                </button>
-                {isSortByMenuOpen && (
-                  <div
-                    className='absolute flex flex-col gap-1 top-15 right-0 bg-[#FDFBF8] shadow-lg w-50 rounded-xl text-primary-text p-2'
-                    onClick={() => setIsSortByMenuOpen(false)}
+                <div className='relative'>
+                  <button
+                    className='border border-input-border rounded-xl text-sm text-secondary-text font-bold px-5 py-3.5 flex items-center gap-2 hover:bg-[#ECE3D6]'
+                    onClick={() => setIsSortByMenuOpen((prev) => !prev)}
                   >
-                    <button
-                      className={`p-3 text-left  rounded-xl ${sortBy === 'Recently updated' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
-                      onClick={() => setSortBy('Recently updated')}
+                    <ListSortDescending size={16} />
+                    {sortBy}
+                  </button>
+                  {isSortByMenuOpen && (
+                    <div
+                      className='absolute flex flex-col gap-1 top-15 right-0 bg-[#FDFBF8] shadow-lg w-50 rounded-xl text-primary-text p-2'
+                      onClick={() => setIsSortByMenuOpen(false)}
                     >
-                      Recently updated
-                    </button>
-                    <button
-                      className={`p-3 text-left  rounded-xl ${sortBy === 'Newest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
-                      onClick={() => setSortBy('Newest first')}
-                    >
-                      Newest first
-                    </button>
-                    <button
-                      className={`p-3 text-left  rounded-xl ${sortBy === 'Oldest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
-                      onClick={() => setSortBy('Oldest first')}
-                    >
-                      Oldest first
-                    </button>
-                    <button
-                      className={`p-3 text-left  rounded-xl ${sortBy === 'Company A-Z' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
-                      onClick={() => setSortBy('Company A-Z')}
-                    >
-                      Company A-Z
-                    </button>
-                  </div>
-                )}
+                      <button
+                        className={`p-3 text-left  rounded-xl ${sortBy === 'Recently updated' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                        onClick={() => setSortBy('Recently updated')}
+                      >
+                        Recently updated
+                      </button>
+                      <button
+                        className={`p-3 text-left  rounded-xl ${sortBy === 'Newest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                        onClick={() => setSortBy('Newest first')}
+                      >
+                        Newest first
+                      </button>
+                      <button
+                        className={`p-3 text-left  rounded-xl ${sortBy === 'Oldest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                        onClick={() => setSortBy('Oldest first')}
+                      >
+                        Oldest first
+                      </button>
+                      <button
+                        className={`p-3 text-left  rounded-xl ${sortBy === 'Company A-Z' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                        onClick={() => setSortBy('Company A-Z')}
+                      >
+                        Company A-Z
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
           </div>
           {isApplicationsPending ? (
             <ApplicationItemSkeleton />
-          ) : (
+          ) : !isApplicationsPending && applications.length == 0 ? (
+            <div className='bg-[#FDFBF8] border border-input-border border-dashed p-4 rounded-xl'>
+              <span className='text-primary-text font-bold'>
+                Add an application to see it listed here!
+              </span>
+            </div>
+          ) : filteredData.length > 0 ? (
             filteredData.map((application: Application) => (
               <div
                 onClick={() => navigate(`/applications/${application.id}`)}
@@ -264,6 +279,10 @@ function Applications() {
                 <ApplicationItem application={application} />
               </div>
             ))
+          ) : (
+            <div className='bg-[#FDFBF8] border border-input-border border-dashed p-4 rounded-xl'>
+              No applications fit these queries
+            </div>
           )}
         </div>
       </div>
