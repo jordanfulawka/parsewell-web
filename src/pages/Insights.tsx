@@ -3,11 +3,6 @@ import useApplications from '../hooks/useApplications';
 function Insights() {
   const { data: applications, byStatus, appliedInLastWeek } = useApplications();
 
-  console.log(byStatus);
-  console.log(appliedInLastWeek);
-
-  console.log(byStatus['APPLIED'].length / applications.length);
-
   return (
     <div className='flex flex-col items-center'>
       <div className='flex flex-col gap-10 w-120 m-10'>
@@ -31,7 +26,7 @@ function Insights() {
               Applied in the past week
             </p>
             <span className='text-4xl font-extrabold'>
-              {applications.length}
+              {appliedInLastWeek.length}
             </span>
           </div>
         </div>
@@ -48,7 +43,7 @@ function Insights() {
                 <div
                   className='flex-1 rounded-full h-2 mr-5 bg-[#8A5C2C] '
                   style={{
-                    width: `${(byStatus['APPLIED'].length / applications.length) * 100}%`,
+                    width: `${applications.length ? (byStatus['APPLIED'].length / applications.length) * 100 : 0}%`,
                   }}
                 />
               </div>
@@ -62,7 +57,7 @@ function Insights() {
                 <div
                   className='flex-1 rounded-full h-2 mr-5 bg-[#345F3E] '
                   style={{
-                    width: `${(byStatus['HEARD_BACK'].length / applications.length) * 100}%`,
+                    width: `${applications.length ? (byStatus['HEARD_BACK'].length / applications.length) * 100 : 0}%`,
                   }}
                 />
               </div>
@@ -76,7 +71,7 @@ function Insights() {
                 <div
                   className='flex-1 rounded-full h-2 mr-5 bg-[#8A3B2E] '
                   style={{
-                    width: `${(byStatus['REJECTED'].length / applications.length) * 100}%`,
+                    width: `${applications.length ? (byStatus['REJECTED'].length / applications.length) * 100 : 0}%`,
                   }}
                 />
               </div>
@@ -90,7 +85,7 @@ function Insights() {
                 <div
                   className='flex-1 rounded-full h-2 mr-5 bg-[#8C4A3D] '
                   style={{
-                    width: `${(byStatus['GHOSTED'].length / applications.length) * 100}%`,
+                    width: `${applications.length ? (byStatus['GHOSTED'].length / applications.length) * 100 : 0}%`,
                   }}
                 />
               </div>

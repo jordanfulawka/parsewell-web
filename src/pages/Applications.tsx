@@ -1,4 +1,10 @@
-import { Plus, FileText, FileExclamationPoint } from 'lucide-react';
+import {
+  Plus,
+  FileText,
+  FileExclamationPoint,
+  FileX,
+  LoaderCircle,
+} from 'lucide-react';
 import { useEffect, useState, type ChangeEvent } from 'react';
 import type { Application, BaseResume } from '../lib/types';
 import {
@@ -21,22 +27,12 @@ import useApplications from '../hooks/useApplications';
 
 function Applications() {
   const [error, setError] = useState('');
+  const [isBaseResumeUploading, setIsBaseResumeUploading] = useState(false);
 
   const { token } = useAuth();
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
-
-  // const { data: applications = [], isPending: isApplicationsPending } =
-  //   useQuery({
-  //     queryKey: ['applications', token],
-  //     queryFn: async () => {
-  //       if (!token) return;
-  //       const applications = await getApplications(token);
-  //       return applications;
-  //     },
-  //     enabled: !!token,
-  //   });
 
   const { data: applications, isPending: isApplicationsPending } =
     useApplications();
@@ -66,6 +62,7 @@ function Applications() {
     e.preventDefault();
     if (!token) return;
     try {
+      setIsBaseResumeUploading(true);
       const presignedUrl = await getBaseResumePresignedPutUrl(token);
       if (e.target.files) {
         const file = e.target.files[0];
@@ -82,10 +79,10 @@ function Applications() {
       }
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to upload resume'));
+    } finally {
+      setIsBaseResumeUploading(false);
     }
   }
-
-  console.log(applications);
 
   async function handleDownload() {
     try {
@@ -120,6 +117,20 @@ function Applications() {
         <ErrorBanner message={error} onDismiss={() => setError('')} />
         {isBaseResumePending ? (
           <BaseResumeSkeleton />
+        ) : isBaseResumeUploading ? (
+          <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
+            <div className='flex items-center gap-2'>
+              <div className='bg-[#F0DFC5] p-3 rounded-lg'>
+                <FileExclamationPoint color='#8A5C2C' />
+              </div>
+              <span className='font-semibold text-secondary-text'>
+                Downloading resume...
+              </span>
+              <span className='animate-spin'>
+                <LoaderCircle size={16} color='#8a7c72' />
+              </span>
+            </div>
+          </div>
         ) : baseResume ? (
           <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
             <div>
@@ -158,7 +169,7 @@ function Applications() {
           <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
             <div className='flex items-center gap-2'>
               <div className='bg-[#F0DFC5] p-3 rounded-lg'>
-                <FileExclamationPoint color='#8A5C2C' />
+                <FileX color='#8A3B2E' />
               </div>
               <span className='font-semibold'>Upload a resume to start</span>
             </div>

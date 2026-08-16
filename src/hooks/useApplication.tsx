@@ -64,7 +64,7 @@ export default function useApplication() {
   };
 
   const application = params.id ? data : emptyJob;
-  const isLoading = params.id ? false : isPending;
+  const isLoading = params.id ? isPending : false;
 
   function updateStatus(status: string) {
     if (!application) return;
