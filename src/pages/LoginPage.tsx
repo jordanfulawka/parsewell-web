@@ -68,7 +68,10 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <button type='submit' className='bg-[#7FA687] p-3 rounded-xl'>
+              <button
+                type='submit'
+                className='bg-[#7FA687] p-3 rounded-xl hover:bg-[#6D9476] cursor-pointer'
+              >
                 <span className='font-bold text-white'>Sign in</span>
               </button>
             </form>
@@ -121,7 +124,10 @@ function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              <button type='submit' className='bg-[#7FA687] p-3 rounded-xl'>
+              <button
+                type='submit'
+                className='bg-[#7FA687] p-3 rounded-xl hover:bg-[#6D9476] cursor-pointer'
+              >
                 <span className='font-bold text-white'>Create account</span>
               </button>
             </form>
