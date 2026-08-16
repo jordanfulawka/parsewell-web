@@ -4,13 +4,43 @@ import { getApplications } from '../lib/api';
 import type { Application } from '../lib/types';
 import { useMemo, useState } from 'react';
 
+type SortBy =
+  | 'Recently updated'
+  | 'Newest first'
+  | 'Oldest first'
+  | 'Company A-Z';
+
+const SORT_OPTIONS: SortBy[] = [
+  'Recently updated',
+  'Newest first',
+  'Oldest first',
+  'Company A-Z',
+];
+
+function isSortBy(value: string | null): value is SortBy {
+  return value != null && SORT_OPTIONS.includes(value as SortBy);
+}
+
 export default function useApplications() {
   const { token } = useAuth();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<
-    'Recently updated' | 'Newest first' | 'Oldest first' | 'Company A-Z'
-  >('Recently updated');
+  const [searchQuery, setSearchQueryState] = useState(
+    () => localStorage.getItem('searchQuery') ?? '',
+  );
+  const [sortBy, setSortByState] = useState<SortBy>(() => {
+    const stored = localStorage.getItem('sortBy');
+    return isSortBy(stored) ? stored : 'Recently updated';
+  });
+
+  function setSearchQuery(query: string) {
+    localStorage.setItem('searchQuery', query);
+    setSearchQueryState(query);
+  }
+
+  function setSortBy(value: SortBy) {
+    localStorage.setItem('sortBy', value);
+    setSortByState(value);
+  }
 
   const { data = [], isPending } = useQuery({
     queryKey: ['applications', token],
@@ -21,8 +51,6 @@ export default function useApplications() {
     },
     enabled: !!token,
   });
-
-  console.log(data);
 
   const { byStatus, appliedInLastWeek, filteredData } = useMemo(() => {
     const byStatus: {

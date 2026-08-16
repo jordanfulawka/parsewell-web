@@ -112,8 +112,8 @@ function Applications() {
   }
 
   return (
-    // might need to change this overflow-y-hidden properly, could cause issues
-    <div className='bg-cream-primary h-full flex justify-center overflow-y-hidden'>
+    // might need to change this overflow-x-hidden properly, could cause issues
+    <div className='bg-cream-primary h-full flex justify-center overflow-x-hidden'>
       <div className='flex flex-col gap-10 h-fit w-170 m-10'>
         <div className='flex items-center justify-between w-full'>
           <h1 className='text-3xl font-extrabold'>Applications</h1>
