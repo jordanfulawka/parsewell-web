@@ -48,11 +48,7 @@ function ApplicationDetails() {
     error: editSuggestionsError,
   } = useEditSuggestions();
 
-  const {
-    data: coverLetter,
-    isPending: covereLetterIsLoading,
-    error: coverLetterError,
-  } = useCoverLetter();
+  const { data: coverLetter } = useCoverLetter();
 
   useEffect(() => {
     // async function fetchCoverLetter() {

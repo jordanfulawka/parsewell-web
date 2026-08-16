@@ -41,7 +41,7 @@ export default function useApplication() {
       );
       return { previousApplication, newApplication };
     },
-    onError: (err, newApplication, context) => {
+    onError: (_err, _newApplication, context) => {
       queryClient.setQueryData(
         ['application', params.id, token],
         context?.previousApplication,

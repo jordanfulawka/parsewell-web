@@ -7,8 +7,8 @@ import {
   Search,
   ListSortDescending,
 } from 'lucide-react';
-import { useEffect, useState, type ChangeEvent } from 'react';
-import type { Application, BaseResume } from '../lib/types';
+import { useState, type ChangeEvent } from 'react';
+import type { Application } from '../lib/types';
 import {
   getBaseResume,
   getBaseResumePresignedGetUrl,
@@ -37,7 +37,6 @@ function Applications() {
   const queryClient = useQueryClient();
 
   const {
-    data: applications,
     isPending: isApplicationsPending,
     searchQuery,
     setSearchQuery,

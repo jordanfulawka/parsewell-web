@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
 import {
   createApplication,
@@ -8,11 +8,10 @@ import {
 } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 import useApplication from '../hooks/useApplication';
-import { getRandomMessage } from '../lib/loadingMessages';
 import Loading from './Loading';
 
 function ApplicationReview() {
-  const [error, setError] = useState('');
+  // const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const params = useParams();
@@ -22,8 +21,8 @@ function ApplicationReview() {
 
   const {
     application,
-    isLoading: applicationIsLoading,
-    error: applicationError,
+    // isLoading: applicationIsLoading,
+    // error: applicationError,
     mutation,
   } = useApplication();
 
@@ -53,7 +52,7 @@ function ApplicationReview() {
       setLoading(false);
       navigate(`/applications/${returnedApplication.id}`);
     } catch (err) {
-      setError(err.message);
+      // setError(err.message);
       console.log(err);
     }
   }

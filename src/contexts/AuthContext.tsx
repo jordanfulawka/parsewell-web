@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import type { User } from '../lib/types';
-import { useNavigate } from 'react-router';
 
 interface AuthContextProps {
   login: (token: string) => void;
