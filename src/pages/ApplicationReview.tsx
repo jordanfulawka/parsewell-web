@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import {
   createApplication,
   createApplicationRequest,
@@ -44,7 +44,7 @@ function ApplicationReview() {
           applicationRequest,
         );
       }
-      const response = await generateResumeEdits(token, returnedApplication.id);
+      await generateResumeEdits(token, returnedApplication.id);
 
       navigate(`/applications/${returnedApplication.id}`);
     } catch (err) {
