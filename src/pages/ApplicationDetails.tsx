@@ -192,7 +192,7 @@ function ApplicationDetails() {
                 {application?.location}
               </div>
               <div className='text-secondary-text'>
-                Applied{' '}
+                Created{' '}
                 {application?.createdAt
                   ? parseDate(application.createdAt, {
                       month: 'short',
@@ -202,42 +202,62 @@ function ApplicationDetails() {
               </div>
             </div>
             <div className='flex gap-4'>
-              <button
-                className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'APPLIED' ? 'bg-[#F0DFC5] text-[#8A5C2C] border-[#8A5C2C]' : 'text-secondary-text border-subtle-border'}`}
-                onClick={() => {
-                  if (!application) return;
-                  updateStatus('APPLIED');
-                }}
-              >
-                <span className='text-sm'>Applied</span>
-              </button>
-              <button
-                className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'HEARD_BACK' ? 'bg-[#DDEBE0] text-[#345F3E] border-[#345F3E]' : 'text-secondary-text border-subtle-border'}`}
-                onClick={() => {
-                  if (!application) return;
-                  updateStatus('HEARD_BACK');
-                }}
-              >
-                <span className='text-sm'>Heard Back</span>
-              </button>
-              <button
-                className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'REJECTED' ? 'bg-[#E8C4B8] text-[#8A3B2E] border-[#8A3B2E]' : 'text-secondary-text border-subtle-border'}`}
-                onClick={() => {
-                  if (!application) return;
-                  updateStatus('REJECTED');
-                }}
-              >
-                <span className='text-sm'>Rejected</span>
-              </button>
-              <button
-                className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'GHOSTED' ? 'bg-[#E3C6BE] text-[#8C4A3D] border-[#8C4A3D]' : 'text-secondary-text border-subtle-border'}`}
-                onClick={() => {
-                  if (!application) return;
-                  updateStatus('GHOSTED');
-                }}
-              >
-                <span className='text-sm'>Ghosted</span>
-              </button>
+              {application.applicationStatus === 'DRAFT' ? (
+                <>
+                  <div className='bg-[#E6DFD6] text-[#6E6157] w-fit rounded-full text-sm font-bold py-2 px-4 border border-subtle-border '>
+                    Draft
+                  </div>
+                  <button
+                    className='bg-[#DDEBE0] text-[#345F3E] border border-[#345F3E] border-dashed w-fit rounded-full text-sm font-bold py-2 px-4 animate-pulse cursor-pointer'
+                    onClick={() => {
+                      if (!application) return;
+                      updateStatus('APPLIED');
+                    }}
+                  >
+                    Mark as applied
+                  </button>
+                </>
+              ) : (
+                <>
+                  {' '}
+                  <button
+                    className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'APPLIED' ? 'bg-[#F0DFC5] text-[#8A5C2C] border-[#8A5C2C]' : 'text-secondary-text border-subtle-border'}`}
+                    onClick={() => {
+                      if (!application) return;
+                      updateStatus('APPLIED');
+                    }}
+                  >
+                    <span className='text-sm'>Applied</span>
+                  </button>
+                  <button
+                    className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'HEARD_BACK' ? 'bg-[#DDEBE0] text-[#345F3E] border-[#345F3E]' : 'text-secondary-text border-subtle-border'}`}
+                    onClick={() => {
+                      if (!application) return;
+                      updateStatus('HEARD_BACK');
+                    }}
+                  >
+                    <span className='text-sm'>Heard Back</span>
+                  </button>
+                  <button
+                    className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'REJECTED' ? 'bg-[#E8C4B8] text-[#8A3B2E] border-[#8A3B2E]' : 'text-secondary-text border-subtle-border'}`}
+                    onClick={() => {
+                      if (!application) return;
+                      updateStatus('REJECTED');
+                    }}
+                  >
+                    <span className='text-sm'>Rejected</span>
+                  </button>
+                  <button
+                    className={`border px-4 py-2 rounded-full flex justify-center items-center font-bold cursor-pointer ${application?.applicationStatus === 'GHOSTED' ? 'bg-[#E3C6BE] text-[#8C4A3D] border-[#8C4A3D]' : 'text-secondary-text border-subtle-border'}`}
+                    onClick={() => {
+                      if (!application) return;
+                      updateStatus('GHOSTED');
+                    }}
+                  >
+                    <span className='text-sm'>Ghosted</span>
+                  </button>{' '}
+                </>
+              )}
             </div>
             <div className='bg-tertiary-text/30 h-px' />
             <div className='flex items-center gap-2'>

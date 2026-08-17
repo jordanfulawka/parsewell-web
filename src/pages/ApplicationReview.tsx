@@ -17,7 +17,6 @@ function ApplicationReview() {
   const params = useParams();
   const navigate = useNavigate();
   const { token } = useAuth();
-  const [searchParams] = useSearchParams();
 
   const {
     application,
@@ -34,26 +33,25 @@ function ApplicationReview() {
       setLoading(true);
       let returnedApplication;
       if (params.id) {
-        console.log(application);
         returnedApplication = await updateApplication(token, application);
       } else {
         const applicationRequest = await createApplicationRequest(
           token,
           application,
         );
-        console.log(applicationRequest);
         returnedApplication = await createApplication(
           token,
           applicationRequest,
         );
       }
       const response = await generateResumeEdits(token, returnedApplication.id);
-      console.log(response);
-      setLoading(false);
+
       navigate(`/applications/${returnedApplication.id}`);
     } catch (err) {
       // setError(err.message);
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -74,15 +72,6 @@ function ApplicationReview() {
         ) : (
           <div className='flex flex-col gap-1'>
             <h2 className='text-2xl font-bold'>Enter the details</h2>
-            <p className='text-secondary-text'>
-              {searchParams.get('error') ? (
-                <span className='text-red-800'>
-                  Unable to fetch job posting information. Please enter manually
-                </span>
-              ) : (
-                'Please enter posting information here.'
-              )}
-            </p>
           </div>
         )}
         <form className='w-full flex flex-col gap-5' onSubmit={handleSubmit}>
@@ -94,7 +83,7 @@ function ApplicationReview() {
               type='text'
               placeholder='e.g. Scotiabank, Google, Stripe'
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
-              value={application?.companyName}
+              value={application?.companyName ?? ''}
               onChange={(e) => {
                 if (!application) return;
                 mutation.mutate({
@@ -113,7 +102,7 @@ function ApplicationReview() {
               type='text'
               placeholder='e.g. Full Stack Engineer, Data Engineer, Embedded Software Developer'
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
-              value={application?.roleTitle}
+              value={application?.roleTitle ?? ''}
               onChange={(e) => {
                 if (!application) return;
                 mutation.mutate({
@@ -132,7 +121,7 @@ function ApplicationReview() {
               type='text'
               placeholder='e.g. Toronto, San Francisco, Remote (US)'
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
-              value={application?.location}
+              value={application?.location ?? ''}
               onChange={(e) => {
                 if (!application) return;
                 mutation.mutate({ ...application, location: e.target.value });
@@ -148,7 +137,7 @@ function ApplicationReview() {
               type='text'
               placeholder='e.g. https://company.com/careers/job-id'
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
-              value={application?.jobURL}
+              value={application?.jobURL ?? ''}
               onChange={(e) => {
                 if (!application) return;
                 mutation.mutate({ ...application, jobURL: e.target.value });
@@ -163,7 +152,7 @@ function ApplicationReview() {
               placeholder='Paste the full job description here...'
               rows={5}
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
-              value={application?.jobDescription}
+              value={application?.jobDescription ?? ''}
               onChange={(e) => {
                 if (!application) return;
                 mutation.mutate({

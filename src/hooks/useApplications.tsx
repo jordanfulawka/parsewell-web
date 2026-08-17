@@ -119,6 +119,7 @@ export default function useApplications() {
 
     data.forEach((application: Application) => {
       if (!application.createdAt) return;
+      if (application.applicationStatus === 'DRAFT') return;
       if (new Date(application.createdAt) >= lastWeek)
         appliedInLastWeek.push(application);
       switch (application.applicationStatus) {

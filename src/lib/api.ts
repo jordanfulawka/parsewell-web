@@ -39,7 +39,6 @@ async function register(name: string, email: string, password: string) {
       body: JSON.stringify({ firstName: name, email, password }),
     },
   );
-  console.log(response);
   if (!response.ok) {
     throw new Error(await getErrorMessage(response));
   }

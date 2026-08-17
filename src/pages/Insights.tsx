@@ -1,4 +1,5 @@
 import useApplications from '../hooks/useApplications';
+import type { Application } from '../lib/types';
 
 function Insights() {
   const { data: applications, byStatus, appliedInLastWeek } = useApplications();
@@ -18,7 +19,12 @@ function Insights() {
               Total applications
             </p>
             <span className='text-4xl font-extrabold'>
-              {applications.length}
+              {
+                applications.filter(
+                  (application: Application) =>
+                    application.applicationStatus !== 'DRAFT',
+                ).length
+              }
             </span>
           </div>
           <div className='bg-[#FDFBF8] flex flex-col justify-around p-5 flex-1 border border-input-border rounded-xl h-30'>

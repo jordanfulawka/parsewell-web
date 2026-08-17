@@ -23,9 +23,15 @@ function ApplicationStatusBadge({ status }: { status: string | undefined }) {
         <span>Ghosted</span>
       </div>
     );
+  } else if (status === 'DRAFT') {
+    return (
+      <div className='bg-[#E6DFD6] text-[#6E6157] w-fit rounded-full text-sm font-bold py-2 px-3'>
+        <span>Draft</span>
+      </div>
+    );
   } else {
     <div className='bg-[#E9E5DE] text-[#7A6E64] w-fit rounded-full text-sm font-bold py-2 px-3'>
-      <span>DRAFT</span>
+      <span>OTHER</span>
     </div>;
   }
 }
