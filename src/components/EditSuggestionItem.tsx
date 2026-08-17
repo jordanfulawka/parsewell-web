@@ -10,9 +10,11 @@ function EditSuggestionItem({
     <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-6'>
       <EditTypeBadge editType={editSuggestion.editType} />
       <div className='flex flex-col gap-3 mt-4'>
-        <p className='text-sm text-secondary-text whitespace-pre-wrap'>
-          {editSuggestion.beforeText}
-        </p>
+        {editSuggestion.beforeText && (
+          <p className='text-sm text-secondary-text whitespace-pre-wrap'>
+            {editSuggestion.beforeText}
+          </p>
+        )}
         <p className='text-primary-text font-bold whitespace-pre-wrap'>
           {editSuggestion.afterText}
         </p>

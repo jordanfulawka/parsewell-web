@@ -23,6 +23,12 @@ function EditTypeBadge({ editType }: { editType: string }) {
         <span>REORDER</span>
       </div>
     );
+  } else if (editType === 'SUMMARY') {
+    return (
+      <div className='bg-[#DDEBE0] text-[#345F3E] w-fit rounded-full text-sm font-bold py-1 px-3'>
+        <span>SUMMARY</span>
+      </div>
+    );
   } else {
     return (
       <div className='bg-[#E9E5DE] text-[#7A6E64] w-fit rounded-full text-sm font-bold py-1 px-3'>

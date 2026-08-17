@@ -51,7 +51,8 @@ type ApplicationStatus =
   | 'REJECTED'
   | 'GHOSTED'
   | 'PROCESSING'
-  | 'DRAFT';
+  | 'DRAFT'
+  | 'SUMMARY';
 
 export type {
   User,

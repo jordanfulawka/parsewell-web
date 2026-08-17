@@ -51,17 +51,6 @@ function ApplicationDetails() {
   const { data: coverLetter } = useCoverLetter();
 
   useEffect(() => {
-    // async function fetchCoverLetter() {
-    //   try {
-    //     if (!token) return;
-    //     if (typeof params.id !== 'string') return;
-    //     const coverLetter = await getCoverLetter(token, params.id);
-    //     setCoverLetter(coverLetter);
-    //   } catch {
-    //     // no cover letter generated yet — not an error state
-    //   }
-    // }
-
     async function fetchFinalMaterials() {
       try {
         if (!token) return;
@@ -74,8 +63,6 @@ function ApplicationDetails() {
       }
     }
 
-    // fetchEditSuggestions();
-    // fetchCoverLetter();
     fetchFinalMaterials();
   }, [token, params.id]);
 
