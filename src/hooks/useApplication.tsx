@@ -22,7 +22,10 @@ export default function useApplication() {
 
   const mutation = useMutation({
     mutationFn: async (updated: Application) => {
-      if (!token) return;
+      if (!token) return updated;
+      // no id yet means this application hasn't been created on the
+      // server, so just keep the edit local until the form is submitted
+      if (!params.id) return updated;
       return await updateApplication(token, updated);
     },
 
@@ -48,6 +51,7 @@ export default function useApplication() {
       );
     },
     onSettled: (newApplication) => {
+      if (!newApplication) return;
       queryClient.invalidateQueries({
         queryKey: ['application', newApplication.id],
       });
@@ -63,7 +67,7 @@ export default function useApplication() {
     jobDescription: '',
   };
 
-  const application = params.id ? data : emptyJob;
+  const application = data ?? emptyJob;
   const isLoading = params.id ? isPending : false;
 
   function updateStatus(status: string) {
