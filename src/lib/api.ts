@@ -298,6 +298,22 @@ async function updateApplication(token: string, application: Application) {
   return response.json();
 }
 
+async function deleteApplicationById(token: string, applicationId: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response));
+  }
+  return response.text();
+}
+
 async function getApplicationById(token: string, applicationId: string) {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}`,
@@ -417,6 +433,7 @@ export {
   generateResumeEdits,
   createApplication,
   updateApplication,
+  deleteApplicationById,
   getEditSuggestions,
   getApplications,
   createApplicationRequest,

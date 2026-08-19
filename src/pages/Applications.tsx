@@ -140,7 +140,7 @@ function Applications() {
                 <FileExclamationPoint color='#8A5C2C' />
               </div>
               <span className='font-semibold text-secondary-text'>
-                Downloading resume...
+                Uploading resume...
               </span>
               <span className='animate-spin'>
                 <LoaderCircle size={16} color='#8a7c72' />

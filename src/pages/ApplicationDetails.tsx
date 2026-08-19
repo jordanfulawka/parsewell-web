@@ -2,6 +2,7 @@ import { useEffect, useState, type ChangeEvent } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
 import {
+  deleteApplicationById,
   generateCoverLetter,
   getFinalMaterialPresignedGetUrl,
   getFinalMaterialPresignedPutUrl,
@@ -22,9 +23,9 @@ import ResumeEditSkeleton from '../skeletons/ResumeEditSkeleton';
 import Loading from './Loading';
 import useEditSuggestions from '../hooks/useEditSuggestions';
 import useCoverLetter from '../hooks/useCoverLetter';
+import ApplicationOptions from '../components/ApplicationOptions';
 
 function ApplicationDetails() {
-  // const [coverLetter, setCoverLetter] = useState('');
   const [showJobDescription, setShowJobDescription] = useState(false);
   const [uploadedResume, setUploadedResume] = useState('');
   const [uploadedCoverLetter, setUploadedCoverLetter] = useState('');
@@ -160,12 +161,28 @@ function ApplicationDetails() {
     }
   }
 
+  async function handleApplicationDelete() {
+    console.log('hi');
+    try {
+      console.log('here');
+      if (!token) return;
+      console.log('token is good');
+      if (typeof params.id !== 'string') return;
+      console.log('hello');
+      await deleteApplicationById(token, params.id);
+    } catch (err) {
+      setError(getErrorMessage(err, 'Error deleting application'));
+    } finally {
+      navigate(`/applications`);
+    }
+  }
+
   if (coverLetterLoading) {
     return <Loading stage='generatingCoverLetter' />;
   }
 
   return (
-    <div className='flex justify-center bg-cream-primary'>
+    <div className='flex justify-center bg-cream-primary overflow-x-hidden'>
       <div className=' p-10 flex flex-col gap-8 w-200'>
         <ErrorBanner
           message={
@@ -178,13 +195,16 @@ function ApplicationDetails() {
         ) : (
           <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5'>
             <div className='flex flex-col gap-2'>
-              <div className='text-2xl font-bold flex items-center gap-3'>
-                {application?.companyName}{' '}
-                {application?.jobURL && (
-                  <a href={application.jobURL} target='_blank'>
-                    <ExternalLink color='#7FA697' />
-                  </a>
-                )}
+              <div className='text-2xl font-bold flex justify-between items-center'>
+                <div className='flex items-center gap-3'>
+                  {application?.companyName}{' '}
+                  {application?.jobURL && (
+                    <a href={application.jobURL} target='_blank'>
+                      <ExternalLink color='#7FA697' />
+                    </a>
+                  )}
+                </div>
+                <ApplicationOptions handleDelete={handleApplicationDelete} />
               </div>
               <div className=''>
                 {application?.roleTitle}{' '}
