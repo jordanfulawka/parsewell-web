@@ -25,7 +25,7 @@ function ApplicationReview() {
     mutation,
   } = useApplication();
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent, edits = 1) {
     e.preventDefault();
     try {
       if (!token) return;
@@ -44,7 +44,7 @@ function ApplicationReview() {
           applicationRequest,
         );
       }
-      await generateResumeEdits(token, returnedApplication.id);
+      if (edits === 1) await generateResumeEdits(token, returnedApplication.id);
 
       navigate(`/applications/${returnedApplication.id}`);
     } catch (err) {
@@ -150,7 +150,7 @@ function ApplicationReview() {
             </label>
             <textarea
               placeholder='Paste the full job description here...'
-              rows={5}
+              rows={3}
               className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl w-full mt-2'
               value={application?.jobDescription ?? ''}
               onChange={(e) => {
@@ -163,13 +163,23 @@ function ApplicationReview() {
               required
             ></textarea>
           </div>
-          <div>
+          <div className='flex flex-col gap-3'>
             <button
               type='submit'
               className='bg-[#7FA687] p-3 rounded-xl w-full hover:bg-[#6D9476]'
             >
               <span className='font-bold text-white'>
                 Save & Generate Edits
+              </span>
+            </button>
+            <button
+              type='button'
+              className='border border-subtle-border p-3 rounded-xl w-full hover:bg-[#ECE3D6]'
+              id='no-edits'
+              onClick={(e) => handleSubmit(e, 0)}
+            >
+              <span className='font-bold text-primary-text'>
+                Save without Generating Edits
               </span>
             </button>
           </div>

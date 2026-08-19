@@ -300,7 +300,9 @@ function ApplicationDetails() {
           <ResumeEditSkeleton />
         ) : (
           <div>
-            <h2 className='text-xl font-bold'>Resume Edits</h2>
+            {editSuggestions.length > 0 && (
+              <h2 className='text-xl font-bold'>Resume Edits</h2>
+            )}
             <div className='flex flex-col gap-3'>
               {editSuggestions.map((editSuggestion: EditSuggestion) => (
                 <EditSuggestionItem
