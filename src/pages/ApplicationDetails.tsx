@@ -73,10 +73,11 @@ function ApplicationDetails() {
       if (typeof params.id !== 'string') return;
       setCoverLetterLoading(true);
       await generateCoverLetter(token, params.id);
-      setCoverLetterLoading(false);
       navigate(`/applications/${params.id}/cover-letter`);
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to generate cover letter'));
+    } finally {
+      setCoverLetterLoading(false);
     }
   }
 
@@ -162,13 +163,9 @@ function ApplicationDetails() {
   }
 
   async function handleApplicationDelete() {
-    console.log('hi');
     try {
-      console.log('here');
       if (!token) return;
-      console.log('token is good');
       if (typeof params.id !== 'string') return;
-      console.log('hello');
       await deleteApplicationById(token, params.id);
     } catch (err) {
       setError(getErrorMessage(err, 'Error deleting application'));
@@ -180,6 +177,8 @@ function ApplicationDetails() {
   if (coverLetterLoading) {
     return <Loading stage='generatingCoverLetter' />;
   }
+
+  console.log(application);
 
   return (
     <div className='flex justify-center bg-cream-primary overflow-x-hidden'>
