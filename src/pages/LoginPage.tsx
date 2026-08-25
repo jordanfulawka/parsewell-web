@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router';
 import { getErrorMessage } from '../lib/utils';
 import ErrorBanner from '../components/ErrorBanner';
+import { LoaderCircle } from 'lucide-react';
 
 function LoginPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -12,6 +13,7 @@ function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -21,19 +23,25 @@ function LoginPage() {
     setError('');
     if (mode === 'signin') {
       try {
+        setLoading(true);
         const response = await apiLogin(email, password);
         login(response.token);
         navigate('/applications');
       } catch (err) {
         setError(getErrorMessage(err, 'Failed to sign in'));
+      } finally {
+        setLoading(false);
       }
     } else {
       try {
+        setLoading(true);
         const response = await register(name, email, password);
         login(response.token);
         navigate('/applications');
       } catch (err) {
         setError(getErrorMessage(err, 'Failed to create account'));
+      } finally {
+        setLoading(false);
       }
     }
   }
@@ -72,7 +80,15 @@ function LoginPage() {
                 type='submit'
                 className='bg-[#7FA687] p-3 rounded-xl hover:bg-[#6D9476] cursor-pointer'
               >
-                <span className='font-bold text-white'>Sign in</span>
+                <div className='font-bold text-white flex justify-center'>
+                  {loading ? (
+                    <div className='animate-spin w-fit'>
+                      <LoaderCircle />
+                    </div>
+                  ) : (
+                    'Sign in'
+                  )}
+                </div>
               </button>
             </form>
             <p className='text-secondary-text'>
@@ -128,7 +144,15 @@ function LoginPage() {
                 type='submit'
                 className='bg-[#7FA687] p-3 rounded-xl hover:bg-[#6D9476] cursor-pointer'
               >
-                <span className='font-bold text-white'>Create account</span>
+                <div className='font-bold text-white flex justify-center'>
+                  {loading ? (
+                    <div className='animate-spin w-fit'>
+                      <LoaderCircle />
+                    </div>
+                  ) : (
+                    'Create account'
+                  )}
+                </div>
               </button>
             </form>
             <p className='text-secondary-text'>
