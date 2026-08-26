@@ -375,6 +375,22 @@ async function generateCoverLetter(token: string, applicationId: string) {
   return response.json();
 }
 
+async function deleteCoverLetter(token: string, applicationId: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/cover-letter`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response));
+  }
+  return response.text();
+}
+
 async function getCoverLetter(token: string, applicationId: string) {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/cover-letter`,
@@ -464,6 +480,7 @@ export {
   getFinalMaterialPresignedGetUrl,
   checkTokenValidation,
   deleteResumeEdits,
+  deleteCoverLetter,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

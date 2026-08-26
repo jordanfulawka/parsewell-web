@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
 import {
   deleteApplicationById,
+  deleteCoverLetter,
   deleteResumeEdits,
   generateCoverLetter,
   generateResumeEdits,
@@ -27,6 +28,7 @@ import Loading from './Loading';
 import useEditSuggestions from '../hooks/useEditSuggestions';
 import useCoverLetter from '../hooks/useCoverLetter';
 import ApplicationOptions from '../components/ApplicationOptions';
+import { resume } from 'react-dom/server';
 
 function ApplicationDetails() {
   const [showJobDescription, setShowJobDescription] = useState(false);
@@ -34,7 +36,8 @@ function ApplicationDetails() {
   const [uploadedCoverLetter, setUploadedCoverLetter] = useState('');
   const [coverLetterLoading, setCoverLetterLoading] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [resumeEditRegenLoading, setResumeEditRegenLoading] = useState(false);
+  const [coverLetterRegenLoading, setCoverLetterRegenLoading] = useState(false);
 
   const { token } = useAuth();
   const params = useParams();
@@ -180,7 +183,7 @@ function ApplicationDetails() {
   }
 
   async function handleResumeRegen() {
-    setLoading(true);
+    setResumeEditRegenLoading(true);
     try {
       if (!token) return;
       if (typeof params.id !== 'string') return;
@@ -191,17 +194,35 @@ function ApplicationDetails() {
       });
     } catch (err) {
       console.log(err);
-      setError(error);
+      setError(getErrorMessage(err, 'Failed to regenerate resume edits'));
     } finally {
-      setLoading(false);
+      setResumeEditRegenLoading(false);
     }
   }
 
-  if (coverLetterLoading) {
+  async function handleCoverLetterRegen() {
+    setCoverLetterRegenLoading(true);
+    try {
+      if (!token) return;
+      if (typeof params.id !== 'string') return;
+      await deleteCoverLetter(token, params.id);
+      await generateCoverLetter(token, params.id);
+      await queryClient.invalidateQueries({
+        queryKey: ['coverLetter', params.id, token],
+      });
+    } catch (err) {
+      console.log(err);
+      setError(getErrorMessage(err, 'Failed to regenerate cover letter'));
+    } finally {
+      setCoverLetterRegenLoading(false);
+    }
+  }
+
+  if (coverLetterLoading || coverLetterRegenLoading) {
     return <Loading stage='generatingCoverLetter' />;
   }
 
-  if (loading) {
+  if (resumeEditRegenLoading) {
     return <Loading stage='generatingResumeEdits' />;
   }
 
@@ -238,6 +259,7 @@ function ApplicationDetails() {
                 </div>
                 <ApplicationOptions
                   handleDelete={handleApplicationDelete}
+                  handleCoverLetterRegen={handleCoverLetterRegen}
                   handleResumeRegen={handleResumeRegen}
                 />
               </div>

@@ -4,9 +4,11 @@ import DeleteModal from './DeleteModal';
 
 function ApplicationOptions({
   handleDelete,
+  handleCoverLetterRegen,
   handleResumeRegen,
 }: {
   handleDelete: () => void;
+  handleCoverLetterRegen: () => void;
   handleResumeRegen: () => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,7 +35,7 @@ function ApplicationOptions({
           </button>
           <button
             className='w-full text-left px-4 py-2 hover:bg-[#ECE3D6] flex justify-between items-center'
-            onClick={() => setShowDeleteModal(true)}
+            onClick={handleCoverLetterRegen}
           >
             Re-generate cover letter
             <FileText />
