@@ -1,9 +1,12 @@
 import { useEffect, useState, type ChangeEvent } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
 import {
   deleteApplicationById,
+  deleteResumeEdits,
   generateCoverLetter,
+  generateResumeEdits,
   getFinalMaterialPresignedGetUrl,
   getFinalMaterialPresignedPutUrl,
   getFinalMaterials,
@@ -31,10 +34,12 @@ function ApplicationDetails() {
   const [uploadedCoverLetter, setUploadedCoverLetter] = useState('');
   const [coverLetterLoading, setCoverLetterLoading] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const { token } = useAuth();
   const params = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const {
     application,
@@ -174,8 +179,30 @@ function ApplicationDetails() {
     }
   }
 
+  async function handleResumeRegen() {
+    setLoading(true);
+    try {
+      if (!token) return;
+      if (typeof params.id !== 'string') return;
+      await deleteResumeEdits(token, params.id);
+      await generateResumeEdits(token, params.id);
+      await queryClient.invalidateQueries({
+        queryKey: ['editSuggestion', params.id, token],
+      });
+    } catch (err) {
+      console.log(err);
+      setError(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (coverLetterLoading) {
     return <Loading stage='generatingCoverLetter' />;
+  }
+
+  if (loading) {
+    return <Loading stage='generatingResumeEdits' />;
   }
 
   console.log(application);
@@ -209,7 +236,10 @@ function ApplicationDetails() {
                     </a>
                   )}
                 </div>
-                <ApplicationOptions handleDelete={handleApplicationDelete} />
+                <ApplicationOptions
+                  handleDelete={handleApplicationDelete}
+                  handleResumeRegen={handleResumeRegen}
+                />
               </div>
               <div className=''>
                 {application?.roleTitle}{' '}

@@ -344,6 +344,22 @@ async function generateResumeEdits(token: string, applicationId: string) {
   return response.json();
 }
 
+async function deleteResumeEdits(token: string, applicationId: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/edits`,
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response));
+  }
+  return response.text();
+}
+
 async function generateCoverLetter(token: string, applicationId: string) {
   const response = await fetch(
     `${import.meta.env.VITE_BASE_URL}/api/v1/applications/${applicationId}/generate-cover-letter`,
@@ -447,6 +463,7 @@ export {
   deleteBaseResume,
   getFinalMaterialPresignedGetUrl,
   checkTokenValidation,
+  deleteResumeEdits,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}
