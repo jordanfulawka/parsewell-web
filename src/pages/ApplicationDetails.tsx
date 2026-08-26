@@ -28,7 +28,6 @@ import Loading from './Loading';
 import useEditSuggestions from '../hooks/useEditSuggestions';
 import useCoverLetter from '../hooks/useCoverLetter';
 import ApplicationOptions from '../components/ApplicationOptions';
-import { resume } from 'react-dom/server';
 
 function ApplicationDetails() {
   const [showJobDescription, setShowJobDescription] = useState(false);
