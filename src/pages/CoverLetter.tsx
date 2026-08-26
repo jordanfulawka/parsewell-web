@@ -5,6 +5,7 @@ import { getApplicationById, getCoverLetter } from '../lib/api';
 import type { Application, ReturnedCoverLetter } from '../lib/types';
 import { getErrorMessage } from '../lib/utils';
 import ErrorBanner from '../components/ErrorBanner';
+import { ArrowBigLeft } from 'lucide-react';
 
 function CoverLetter() {
   const [coverLetter, setCoverLetter] = useState<ReturnedCoverLetter | null>(
@@ -48,7 +49,13 @@ function CoverLetter() {
     <div className='flex justify-center bg-cream-primary'>
       <div className=' p-10 flex flex-col gap-8 w-200'>
         <ErrorBanner message={error} onDismiss={() => setError('')} />
-        <div className='flex flex-col'>
+        <div className='flex flex-col relative'>
+          <button
+            className='absolute w-15 h-15 top-0 -left-20 border border-subtle-border flex justify-center items-center rounded-xl bg-[#FDFBF8] hover:border-tertiary-text'
+            onClick={() => navigate(`/applications/${params.id}`)}
+          >
+            <ArrowBigLeft />
+          </button>
           <span className='text-2xl font-bold'>Cover Letter</span>
           <span className='text-secondary-text'>
             {application?.roleTitle} at {application?.companyName}

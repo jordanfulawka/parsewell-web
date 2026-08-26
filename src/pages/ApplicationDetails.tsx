@@ -10,7 +10,7 @@ import {
   uploadCoverLetter,
   uploadResume,
 } from '../lib/api';
-import { ChevronDown, Upload, ExternalLink } from 'lucide-react';
+import { ChevronDown, Upload, ExternalLink, ArrowBigLeft } from 'lucide-react';
 import type { EditSuggestion } from '../lib/types';
 import EditSuggestionItem from '../components/EditSuggestionItem';
 import { parseDate } from '../lib/utils';
@@ -192,7 +192,13 @@ function ApplicationDetails() {
         {applicationIsLoading ? (
           <ApplicationDetailSkeleton />
         ) : (
-          <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5'>
+          <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5 relative'>
+            <button
+              className='absolute w-15 h-15 top-0 -left-20 border border-subtle-border flex justify-center items-center rounded-xl bg-[#FDFBF8] hover:border-tertiary-text'
+              onClick={() => navigate('/applications')}
+            >
+              <ArrowBigLeft />
+            </button>
             <div className='flex flex-col gap-2'>
               <div className='text-2xl font-bold flex justify-between items-center'>
                 <div className='flex items-center gap-3'>
