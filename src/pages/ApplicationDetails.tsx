@@ -192,7 +192,6 @@ function ApplicationDetails() {
         queryKey: ['editSuggestion', params.id, token],
       });
     } catch (err) {
-      console.log(err);
       setError(getErrorMessage(err, 'Failed to regenerate resume edits'));
     } finally {
       setResumeEditRegenLoading(false);
@@ -210,7 +209,6 @@ function ApplicationDetails() {
         queryKey: ['coverLetter', params.id, token],
       });
     } catch (err) {
-      console.log(err);
       setError(getErrorMessage(err, 'Failed to regenerate cover letter'));
     } finally {
       setCoverLetterRegenLoading(false);
@@ -224,8 +222,6 @@ function ApplicationDetails() {
   if (resumeEditRegenLoading) {
     return <Loading stage='generatingResumeEdits' />;
   }
-
-  console.log(application);
 
   return (
     <div className='flex justify-center bg-cream-primary overflow-x-hidden'>
@@ -241,7 +237,7 @@ function ApplicationDetails() {
         ) : (
           <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5 relative'>
             <button
-              className='absolute w-15 h-15 top-0 -left-20 border border-subtle-border flex justify-center items-center rounded-xl bg-[#FDFBF8] hover:border-tertiary-text'
+              className='fixed w-15 h-15 top-40 left-45 border border-subtle-border flex justify-center items-center rounded-xl bg-[#FDFBF8] hover:border-tertiary-text'
               onClick={() => navigate('/applications')}
             >
               <ArrowBigLeft />
