@@ -3,11 +3,22 @@ import { useAuth } from '../contexts/AuthContext';
 import { useParams } from 'react-router';
 import { getApplicationById, updateApplication } from '../lib/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 export default function useApplication() {
   const { token } = useAuth();
   const params = useParams();
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!params.id) {
+      queryClient.removeQueries({
+        queryKey: ['application', params.id, token],
+        exact: true,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['application', params.id, token],
