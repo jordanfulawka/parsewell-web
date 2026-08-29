@@ -51,7 +51,7 @@ function CoverLetter() {
         <ErrorBanner message={error} onDismiss={() => setError('')} />
         <div className='flex flex-col relative'>
           <button
-            className='fixed w-15 h-15 top-40 left-45 border border-subtle-border flex justify-center items-center rounded-xl bg-[#FDFBF8] hover:border-tertiary-text'
+            className='absolute w-15 h-15 top-0 -left-20 border border-subtle-border flex justify-center items-center rounded-xl bg-[#FDFBF8] hover:border-tertiary-text'
             onClick={() => navigate(`/applications/${params.id}`)}
           >
             <ArrowBigLeft />

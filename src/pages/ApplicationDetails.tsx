@@ -225,7 +225,7 @@ function ApplicationDetails() {
 
   return (
     <div className='flex justify-center bg-cream-primary overflow-x-hidden'>
-      <div className=' p-10 flex flex-col gap-8 w-200'>
+      <div className=' p-10 flex flex-col gap-8 w-200 relative'>
         <ErrorBanner
           message={
             applicationError?.message || editSuggestionsError?.message || error
@@ -237,7 +237,7 @@ function ApplicationDetails() {
         ) : (
           <div className='bg-[#FDFBF8] border border-subtle-border rounded-xl p-5 flex flex-col gap-5 relative'>
             <button
-              className='fixed w-15 h-15 top-40 left-45 border border-subtle-border flex justify-center items-center rounded-xl bg-[#FDFBF8] hover:border-tertiary-text'
+              className='absolute w-15 h-15 top-0 -left-20 border border-subtle-border flex justify-center items-center rounded-xl bg-[#FDFBF8] hover:border-tertiary-text'
               onClick={() => navigate('/applications')}
             >
               <ArrowBigLeft />
