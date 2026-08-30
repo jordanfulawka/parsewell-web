@@ -127,8 +127,6 @@ export default function useApplications() {
       });
     }
 
-    console.log(filteredData);
-
     data.forEach((application: Application) => {
       if (!application.createdAt) return;
       if (application.applicationStatus === 'DRAFT') return;
