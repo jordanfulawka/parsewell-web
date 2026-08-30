@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
 import { getApplications } from '../lib/api';
-import type { Application } from '../lib/types';
+import type { Application, ApplicationStatus } from '../lib/types';
 import { useMemo, useState } from 'react';
 
 type SortBy =
@@ -31,6 +31,8 @@ export default function useApplications() {
     const stored = localStorage.getItem('sortBy');
     return isSortBy(stored) ? stored : 'Recently updated';
   });
+
+  const [statusFilter, setStatusFilter] = useState<ApplicationStatus[]>([]);
 
   function setSearchQuery(query: string) {
     localStorage.setItem('searchQuery', query);
@@ -75,7 +77,7 @@ export default function useApplications() {
       today.getDate() - 7,
     );
 
-    const filteredData: Application[] = [];
+    let filteredData: Application[] = [];
     data.forEach((application: Application) => {
       if (
         application.companyName
@@ -117,6 +119,16 @@ export default function useApplications() {
       });
     }
 
+    if (statusFilter.length > 0) {
+      filteredData = filteredData.filter((application) => {
+        return statusFilter.includes(
+          application.applicationStatus as ApplicationStatus,
+        );
+      });
+    }
+
+    console.log(filteredData);
+
     data.forEach((application: Application) => {
       if (!application.createdAt) return;
       if (application.applicationStatus === 'DRAFT') return;
@@ -141,7 +153,7 @@ export default function useApplications() {
     });
 
     return { byStatus, appliedInLastWeek, filteredData };
-  }, [data, searchQuery, sortBy]);
+  }, [data, searchQuery, sortBy, statusFilter]);
 
   return {
     data,
@@ -153,5 +165,7 @@ export default function useApplications() {
     sortBy,
     setSortBy,
     filteredData,
+    statusFilter,
+    setStatusFilter,
   };
 }

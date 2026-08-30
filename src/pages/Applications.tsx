@@ -25,6 +25,7 @@ import BaseResumeSkeleton from '../skeletons/BaseResumeSkeleton';
 import ApplicationItemSkeleton from '../skeletons/ApplicationItemSkeleton';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import useApplications from '../hooks/useApplications';
+import StatusFilter from '../components/StatusFilter';
 
 function Applications() {
   const [error, setError] = useState('');
@@ -44,6 +45,9 @@ function Applications() {
     sortBy,
     setSortBy,
     filteredData,
+    statusFilter,
+    setStatusFilter,
+    byStatus,
   } = useApplications();
 
   const { data: baseResume, isPending: isBaseResumePending } = useQuery({
@@ -208,56 +212,65 @@ function Applications() {
         <div className='flex flex-col gap-4'>
           <div>
             {applications.length > 0 && (
-              <div className='flex justify-between gap-4 relative'>
-                <span className='absolute top-4 left-3'>
-                  <Search size={16} />
-                </span>
-                <input
-                  className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl pl-10 flex-1'
-                  placeholder='Search company, role, or location'
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+              <div className='flex-col'>
+                <div className='flex justify-between gap-4 relative'>
+                  <span className='absolute top-4 left-3'>
+                    <Search size={16} />
+                  </span>
+                  <input
+                    className='bg-[#FDFBF8] border border-input-border p-3 rounded-xl pl-10 flex-1'
+                    placeholder='Search company, role, or location'
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
 
-                <div className='relative'>
-                  <button
-                    className='border border-input-border rounded-xl text-sm text-secondary-text font-bold px-5 py-3.5 flex items-center gap-2 hover:bg-[#ECE3D6]'
-                    onClick={() => setIsSortByMenuOpen((prev) => !prev)}
-                  >
-                    <ListSortDescending size={16} />
-                    {sortBy}
-                  </button>
-                  {isSortByMenuOpen && (
-                    <div
-                      className='absolute flex flex-col gap-1 top-15 right-0 bg-[#FDFBF8] shadow-lg w-50 rounded-xl text-primary-text p-2'
-                      onClick={() => setIsSortByMenuOpen(false)}
+                  <div className='relative'>
+                    <button
+                      className='border border-input-border rounded-xl text-sm text-secondary-text font-bold px-5 py-3.5 flex items-center gap-2 hover:bg-[#ECE3D6]'
+                      onClick={() => setIsSortByMenuOpen((prev) => !prev)}
                     >
-                      <button
-                        className={`p-3 text-left  rounded-xl ${sortBy === 'Recently updated' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
-                        onClick={() => setSortBy('Recently updated')}
+                      <ListSortDescending size={16} />
+                      {sortBy}
+                    </button>
+                    {isSortByMenuOpen && (
+                      <div
+                        className='absolute flex flex-col gap-1 top-15 right-0 bg-[#FDFBF8] shadow-lg w-50 rounded-xl text-primary-text p-2'
+                        onClick={() => setIsSortByMenuOpen(false)}
                       >
-                        Recently updated
-                      </button>
-                      <button
-                        className={`p-3 text-left  rounded-xl ${sortBy === 'Newest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
-                        onClick={() => setSortBy('Newest first')}
-                      >
-                        Newest first
-                      </button>
-                      <button
-                        className={`p-3 text-left  rounded-xl ${sortBy === 'Oldest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
-                        onClick={() => setSortBy('Oldest first')}
-                      >
-                        Oldest first
-                      </button>
-                      <button
-                        className={`p-3 text-left  rounded-xl ${sortBy === 'Company A-Z' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
-                        onClick={() => setSortBy('Company A-Z')}
-                      >
-                        Company A-Z
-                      </button>
-                    </div>
-                  )}
+                        <button
+                          className={`p-3 text-left  rounded-xl ${sortBy === 'Recently updated' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                          onClick={() => setSortBy('Recently updated')}
+                        >
+                          Recently updated
+                        </button>
+                        <button
+                          className={`p-3 text-left  rounded-xl ${sortBy === 'Newest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                          onClick={() => setSortBy('Newest first')}
+                        >
+                          Newest first
+                        </button>
+                        <button
+                          className={`p-3 text-left  rounded-xl ${sortBy === 'Oldest first' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                          onClick={() => setSortBy('Oldest first')}
+                        >
+                          Oldest first
+                        </button>
+                        <button
+                          className={`p-3 text-left  rounded-xl ${sortBy === 'Company A-Z' ? 'bg-[#DDEBE0]' : 'hover:bg-[#ECE3D6]'}`}
+                          onClick={() => setSortBy('Company A-Z')}
+                        >
+                          Company A-Z
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className='mt-3'>
+                  <StatusFilter
+                    selectedStatus={statusFilter}
+                    setSelectedStatus={setStatusFilter}
+                    byStatus={byStatus}
+                  />
                 </div>
               </div>
             )}
