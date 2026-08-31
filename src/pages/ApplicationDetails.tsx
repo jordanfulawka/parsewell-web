@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
@@ -8,24 +8,12 @@ import {
   deleteResumeEdits,
   generateCoverLetter,
   generateResumeEdits,
-  getFinalMaterialPresignedGetUrl,
-  // getFinalMaterialPresignedPutUrl,
-  // getFinalMaterials,
-  // uploadCoverLetter,
-  // uploadResume,
 } from '../lib/api';
-import {
-  ChevronDown,
-  Upload,
-  ExternalLink,
-  ArrowBigLeft,
-  FileUp,
-} from 'lucide-react';
+import { ChevronDown, ExternalLink, ArrowBigLeft } from 'lucide-react';
 import type { EditSuggestion } from '../lib/types';
 import EditSuggestionItem from '../components/EditSuggestionItem';
 import { parseDate } from '../lib/utils';
 import useApplication from '../hooks/useApplication';
-import FileOptions from '../components/FileOptions';
 import ErrorBanner from '../components/ErrorBanner';
 import { getErrorMessage } from '../lib/utils';
 import ApplicationDetailSkeleton from '../skeletons/ApplicationDetailSkeleton';
