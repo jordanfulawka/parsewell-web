@@ -9,12 +9,18 @@ import {
   generateCoverLetter,
   generateResumeEdits,
   getFinalMaterialPresignedGetUrl,
-  getFinalMaterialPresignedPutUrl,
-  getFinalMaterials,
-  uploadCoverLetter,
-  uploadResume,
+  // getFinalMaterialPresignedPutUrl,
+  // getFinalMaterials,
+  // uploadCoverLetter,
+  // uploadResume,
 } from '../lib/api';
-import { ChevronDown, Upload, ExternalLink, ArrowBigLeft } from 'lucide-react';
+import {
+  ChevronDown,
+  Upload,
+  ExternalLink,
+  ArrowBigLeft,
+  FileUp,
+} from 'lucide-react';
 import type { EditSuggestion } from '../lib/types';
 import EditSuggestionItem from '../components/EditSuggestionItem';
 import { parseDate } from '../lib/utils';
@@ -28,12 +34,11 @@ import Loading from './Loading';
 import useEditSuggestions from '../hooks/useEditSuggestions';
 import useCoverLetter from '../hooks/useCoverLetter';
 import ApplicationOptions from '../components/ApplicationOptions';
-// import FileDropUploader from '../components/FileDropUploader';
+import FileUploader from '../components/FileUploader';
+// import FileUploader from '../components/FileUploader';
 
 function ApplicationDetails() {
   const [showJobDescription, setShowJobDescription] = useState(false);
-  const [uploadedResume, setUploadedResume] = useState('');
-  const [uploadedCoverLetter, setUploadedCoverLetter] = useState('');
   const [coverLetterLoading, setCoverLetterLoading] = useState(false);
   const [error, setError] = useState('');
   const [resumeEditRegenLoading, setResumeEditRegenLoading] = useState(false);
@@ -59,22 +64,6 @@ function ApplicationDetails() {
 
   const { data: coverLetter } = useCoverLetter();
 
-  useEffect(() => {
-    async function fetchFinalMaterials() {
-      try {
-        if (!token) return;
-        if (typeof params.id !== 'string') return;
-        const finalMaterials = await getFinalMaterials(token, params.id);
-        setUploadedCoverLetter(finalMaterials.coverLetterFilename);
-        setUploadedResume(finalMaterials.resumeFilename);
-      } catch {
-        // no submitted materials yet — not an error state
-      }
-    }
-
-    fetchFinalMaterials();
-  }, [token, params.id]);
-
   async function handleCoverLetterGeneration() {
     try {
       if (!token) return;
@@ -86,116 +75,6 @@ function ApplicationDetails() {
       setError(getErrorMessage(err, 'Failed to generate cover letter'));
     } finally {
       setCoverLetterLoading(false);
-    }
-  }
-
-  async function handleUpload(e: ChangeEvent<HTMLInputElement>) {
-    e.preventDefault();
-    if (!token) return;
-    if (typeof params.id !== 'string') return;
-    try {
-      if (e.target.files) {
-        const file = e.target.files[0];
-        if (e.target.id === 'coverLetterUpload') {
-          const presignedUrl = await getFinalMaterialPresignedPutUrl(
-            token,
-            params.id,
-            'coverLetter',
-          );
-          const uploadResponse = await fetch(presignedUrl, {
-            method: 'PUT',
-            body: file,
-            headers: {
-              'Content-Type': file.type,
-            },
-          });
-          if (!uploadResponse.ok)
-            throw new Error('Failed to upload cover letter');
-          const uploadedCoverLetter = await uploadCoverLetter(
-            token,
-            params.id,
-            file.name,
-          );
-          setUploadedCoverLetter(uploadedCoverLetter.coverLetterFilename);
-          setError('');
-        } else if (e.target.id === 'resumeUpload') {
-          const presignedUrl = await getFinalMaterialPresignedPutUrl(
-            token,
-            params.id,
-            'resume',
-          );
-          const uploadResponse = await fetch(presignedUrl, {
-            method: 'PUT',
-            body: file,
-            headers: {
-              'Content-Type': file.type,
-            },
-          });
-          if (!uploadResponse.ok) throw new Error('Failed to upload resume');
-          const uploadedResume = await uploadResume(
-            token,
-            params.id,
-            file.name,
-          );
-          setUploadedResume(uploadedResume.resumeFilename);
-          setError('');
-        }
-      }
-    } catch (err) {
-      setError(getErrorMessage(err, 'There was an error uploading this file'));
-    }
-  }
-
-  // async function handleUploadForDroppedFile(e) {
-  //   e.preventDefault();
-  //   if (!token) return;
-  //   if (typeof params.id !== 'string') return;
-  //   try {
-  //     if (e.target.id === 'resumeUpload') {
-  //       const file = e.dataTransfer.files[0];
-  //       const presignedUrl = await getFinalMaterialPresignedPutUrl(
-  //         token,
-  //         params.id,
-  //         'resume',
-  //       );
-  //       const uploadResponse = await fetch(presignedUrl, {
-  //         method: 'PUT',
-  //         body: file,
-  //         headers: {
-  //           'Content-Type': file.type,
-  //         },
-  //       });
-  //       if (!uploadResponse.ok) throw new Error('Failed to upload resume');
-  //       const uploadedResume = await uploadResume(token, params.id, file.name);
-  //       setUploadedResume(uploadedResume.resumeFilename);
-  //       setError('');
-  //     }
-  //   } catch (err) {
-  //     setError(getErrorMessage(err, 'There was an error uploading this file'));
-  //   }
-  // }
-
-  async function handleDownload(type: string) {
-    try {
-      if (!token || typeof params.id !== 'string') return;
-      const presignedUrl = await getFinalMaterialPresignedGetUrl(
-        token,
-        params.id,
-        type,
-      );
-      const response = await fetch(presignedUrl);
-      if (!response.ok) throw new Error(`Failed to download ${type}`);
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = type === 'resume' ? uploadedResume : uploadedCoverLetter;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      setError(
-        getErrorMessage(err, 'There was an issue downloading this file'),
-      );
     }
   }
 
@@ -420,74 +299,7 @@ function ApplicationDetails() {
             Attach the files you applied with, so you always know which version
             went out.
           </p>
-          <div className='flex gap-5 mt-2'>
-            <div className='flex-1 bg-[#FDFBF8] border border-subtle-border border-dashed p-5 flex flex-col gap-3 rounded-xl'>
-              <span className='text-primary-text font-bold text-sm'>
-                Resume Sent
-              </span>
-              {uploadedResume ? (
-                <div className='flex items-center justify-between gap-2 font-bold text-sm text-tertiary-text'>
-                  <div>{uploadedResume}</div>
-                  {/* <FileDropUploader
-                    fileType='resumeUpload'
-                    onChange={handleUploadForDroppedFile}
-                  /> */}
-                  <FileOptions
-                    padding={1}
-                    onReplace={handleUpload}
-                    onDownload={() => handleDownload('resume')}
-                    id='resumeUpload'
-                  />
-                </div>
-              ) : (
-                <label
-                  className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
-                  htmlFor='resumeUpload'
-                >
-                  <Upload size={16} /> Attach resume
-                  <input
-                    type='file'
-                    className='hidden'
-                    id='resumeUpload'
-                    onChange={handleUpload}
-                  />
-                  {/* <FileDropUploader
-                    fileType='resumeUpload'
-                    onChange={handleUploadForDroppedFile}
-                  /> */}
-                </label>
-              )}
-            </div>
-            <div className='flex-1 bg-[#FDFBF8] border border-subtle-border border-dashed p-5 flex flex-col gap-3 rounded-xl'>
-              <span className='text-primary-text font-bold text-sm'>
-                Cover letter sent
-              </span>
-              {uploadedCoverLetter ? (
-                <div className='flex items-center justify-between gap-2 font-bold text-sm text-tertiary-text'>
-                  <div>{uploadedCoverLetter}</div>
-                  <FileOptions
-                    padding={1}
-                    onReplace={(e) => handleUpload(e)}
-                    onDownload={() => handleDownload('coverLetter')}
-                    id='coverLetterUpload'
-                  />
-                </div>
-              ) : (
-                <label
-                  className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
-                  htmlFor='coverLetterUpload'
-                >
-                  <Upload size={16} /> Attach cover letter
-                  <input
-                    type='file'
-                    className='hidden'
-                    id='coverLetterUpload'
-                    onChange={handleUpload}
-                  />
-                </label>
-              )}
-            </div>
-          </div>
+          <FileUploader />
         </div>
       </div>
     </div>
