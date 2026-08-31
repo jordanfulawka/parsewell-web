@@ -28,6 +28,7 @@ import Loading from './Loading';
 import useEditSuggestions from '../hooks/useEditSuggestions';
 import useCoverLetter from '../hooks/useCoverLetter';
 import ApplicationOptions from '../components/ApplicationOptions';
+// import FileDropUploader from '../components/FileDropUploader';
 
 function ApplicationDetails() {
   const [showJobDescription, setShowJobDescription] = useState(false);
@@ -144,6 +145,35 @@ function ApplicationDetails() {
       setError(getErrorMessage(err, 'There was an error uploading this file'));
     }
   }
+
+  // async function handleUploadForDroppedFile(e) {
+  //   e.preventDefault();
+  //   if (!token) return;
+  //   if (typeof params.id !== 'string') return;
+  //   try {
+  //     if (e.target.id === 'resumeUpload') {
+  //       const file = e.dataTransfer.files[0];
+  //       const presignedUrl = await getFinalMaterialPresignedPutUrl(
+  //         token,
+  //         params.id,
+  //         'resume',
+  //       );
+  //       const uploadResponse = await fetch(presignedUrl, {
+  //         method: 'PUT',
+  //         body: file,
+  //         headers: {
+  //           'Content-Type': file.type,
+  //         },
+  //       });
+  //       if (!uploadResponse.ok) throw new Error('Failed to upload resume');
+  //       const uploadedResume = await uploadResume(token, params.id, file.name);
+  //       setUploadedResume(uploadedResume.resumeFilename);
+  //       setError('');
+  //     }
+  //   } catch (err) {
+  //     setError(getErrorMessage(err, 'There was an error uploading this file'));
+  //   }
+  // }
 
   async function handleDownload(type: string) {
     try {
@@ -398,6 +428,10 @@ function ApplicationDetails() {
               {uploadedResume ? (
                 <div className='flex items-center justify-between gap-2 font-bold text-sm text-tertiary-text'>
                   <div>{uploadedResume}</div>
+                  {/* <FileDropUploader
+                    fileType='resumeUpload'
+                    onChange={handleUploadForDroppedFile}
+                  /> */}
                   <FileOptions
                     padding={1}
                     onReplace={handleUpload}
@@ -417,6 +451,10 @@ function ApplicationDetails() {
                     id='resumeUpload'
                     onChange={handleUpload}
                   />
+                  {/* <FileDropUploader
+                    fileType='resumeUpload'
+                    onChange={handleUploadForDroppedFile}
+                  /> */}
                 </label>
               )}
             </div>

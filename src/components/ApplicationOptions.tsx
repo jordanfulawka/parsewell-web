@@ -16,7 +16,7 @@ function ApplicationOptions({
 
   return (
     <>
-      <div className='relative '>
+      <div className='relative'>
         <button
           className='border border-subtle-border rounded-xl flex items-center p-1 hover:bg-[#ECE3D6]'
           onClick={() => setIsOpen((prev) => !prev)}
