@@ -82,7 +82,7 @@ src/
 └── skeletons/        Per-section loading placeholders
 ```
 
-## Routes
+### Routes
 
 | Path                             | Page                                                   |
 | -------------------------------- | ------------------------------------------------------ |
@@ -94,7 +94,33 @@ src/
 | `/applications/:id/cover-letter` | Generated cover letter                                 |
 | `/insights`                      | Application activity summary                           |
 
-## Getting started
+Everythign except `/login` sits behind `ProtectedRoutes`, which redirects when no token is present and renders nothing while the token is stil being restored from storage. Returning `null` during that window rather than redirecting immediately is what stops a full-page flash to the login screen on refresh.
+
+## State management
+
+Server state is TanStack Query. Client state is useState and one context. I opted not to use something like Redux or Zustand as nothing in the app is genuinely global client state apart from the auth token.
+
+Query keys include the token (`['application', id, token]`), so cached data is scoped per session and does not leak across a logout and a different login.
+
+**Optimistic status updates.** Changing an application's status writes to the cache before the request resolves, snapshots the previous value, rolls back on error, and invalidates on settle.
+
+```tsx
+onMutate: async (newApplication) => {
+  await queryClient.cancelQueries({ queryKey: ['application', params.id, token] });
+  const previousApplication = queryClient.getQueryData(['application', params.id, token]);
+  queryClient.setQueryData(['application', params.id, token], newApplication);
+  return { previousApplication, newApplication };
+},
+onError: (_err, _newApplication, context) => {
+  queryClient.setQueryData(['application', params.id, token], context?.previousApplication);
+},
+```
+
+**Derived state is computed, not stored.** `useApplications` runs filtering, sorting, status grouping, and the last-seven-days count inside a single `useMemo` keyed on the raw data, the search query, and the sort order. Nothing derived is duplicted into state, so there is no way for the list and the counts to disagree.
+
+**A shared hook covers both create and edit.** `useApplication` returns an empty draft object when no route parameter is present and the fetch application when there is one, which lets `ApplicationReview` back the manual entry form and the scraped review form with the same component.
+
+## Running Locally
 
 ### Prerequisites
 
@@ -155,7 +181,12 @@ Warm cream background with sage green and clay accents, set in Nunito. The font 
 | Sage accent  | ![#7FA687](https://img.shields.io/badge/-7FA687-7FA687?style=flat-square) |
 | Clay accent  | ![#BC7F53](https://img.shields.io/badge/-BC7F53-BC7F53?style=flat-square) |
 
-## Readmap
+## Roadmap
 
-- Responsive layout for narrow viewports
+- Accept and reject individual edit suggestions, with an assembled final resume
+- Component and integration tests
+- Route-level code splitting with React.lazy
+- Replace the remaining any in the API layer with generated types from the backend
+- Richer insights: response rate over time, breakdown by channel
+- Refresh tokens, so sessions survide past the access token lifetime
 - Export tailed resumes directly rather than relying on manual re-upload

@@ -10,7 +10,7 @@ interface BaseResume {
   userId: string;
   content: string;
   fileName: string;
-  origianlFileUrl: string;
+  originalFileUrl: string;
   createdAt: string;
 }
 
