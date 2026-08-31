@@ -202,7 +202,7 @@ function FileUploader() {
     <div className='flex gap-5 mt-2'>
       {error && <ErrorBanner message={error} />}
       <div
-        className={`flex-1 bg-[#FDFBF8] border border-subtle-border border-dashed p-5 flex flex-col gap-3 rounded-xl ${isDraggingResume ? 'bg-amber-500' : ''}`}
+        className={`flex-1 border-2 p-5 flex flex-col gap-3 rounded-xl transition-colors duration-150 ${isDraggingResume ? 'bg-[#F5EAD8] border-[#C9A66B] border-solid' : 'bg-[#FDFBF8] border-subtle-border border-dashed'}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragEnter={(e) => {
@@ -233,7 +233,7 @@ function FileUploader() {
           </div>
         ) : (
           <label
-            className={`flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer ${isDraggingResume ? 'bg-amber-500' : ''}`}
+            className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
             htmlFor='resumeUpload'
           >
             <Upload size={16} /> Attach resume
@@ -247,7 +247,7 @@ function FileUploader() {
         )}
       </div>
       <div
-        className={`flex-1 bg-[#FDFBF8] border border-subtle-border border-dashed p-5 flex flex-col gap-3 rounded-xl ${isDraggingCoverLetter ? 'bg-amber-500' : ''}`}
+        className={`flex-1 border-2 p-5 flex flex-col gap-3 rounded-xl transition-colors duration-150 ${isDraggingCoverLetter ? 'bg-[#F5EAD8] border-[#C9A66B] border-solid' : 'bg-[#FDFBF8] border-subtle-border border-dashed'}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragEnter={(e) => {
@@ -280,7 +280,7 @@ function FileUploader() {
           </div>
         ) : (
           <label
-            className={`flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer ${isDraggingCoverLetter ? 'bg-amber-500' : ''}`}
+            className='flex items-center gap-2 font-bold text-sm text-tertiary-text cursor-pointer'
             htmlFor='coverLetterUpload'
           >
             <Upload size={16} /> Attach cover letter
