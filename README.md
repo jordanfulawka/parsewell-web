@@ -68,6 +68,27 @@ File transfers bypass the API entirely. The client asks the backend for a presig
 
 Long-running AI calls are synchronous, so the UI covers them with a dedicated loading screen that cycles through stage-specific messages defined in `src/lib/loadingMessages.ts`. Shorted fetches use per-section skeletons rather than a blocking spinner.
 
+```mermaid
+flowchart TD
+    subgraph Browser
+        Pages["Pages<br/>routed views"]
+        Hooks["Hooks<br/>useApplications, useApplication,<br/>useEditSuggestions, useCoverLetter"]
+        Query["TanStack Query cache"]
+        Auth["AuthContext<br/>token + decoded user"]
+        Api["lib/api.ts<br/>typed fetch wrappers"]
+    end
+
+    API["Parsewell API<br/>api.parsewell.app"]
+    S3[("AWS S3")]
+
+    Pages --> Hooks --> Query --> Api
+    Pages --> Api
+    Auth --> Hooks
+    Api -->|"Bearer token"| API
+    Pages -.->|"presigned PUT / GET"| S3
+    API -.->|"issues presigned URLs"| Pages
+```
+
 ## Project structure
 
 ```
