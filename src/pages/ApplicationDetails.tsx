@@ -241,20 +241,24 @@ function ApplicationDetails() {
               )}
             </div>
             <div className='bg-tertiary-text/30 h-px' />
-            <div className='flex items-center gap-2'>
-              <h4 className='font-bold text-primary-text'>Job description</h4>
-              <button
-                className={`${showJobDescription ? '' : 'rotate-180'} transition-transform`}
-                onClick={() => setShowJobDescription((prev) => !prev)}
+            <div>
+              <div className='flex items-center gap-2'>
+                <h4 className='font-bold text-primary-text'>Job description</h4>
+                <button
+                  className={`${showJobDescription ? '' : 'rotate-180'} transition-transform duration-300`}
+                  onClick={() => setShowJobDescription((prev) => !prev)}
+                >
+                  <ChevronDown size={16} />
+                </button>
+              </div>
+              <div
+                className={`grid transition-all duration-300 ease-in-out ${showJobDescription ? 'grid-rows-[1fr] opacity-100 mt-2' : 'grid-rows-[0fr] opacity-0 mt-0'}`}
               >
-                <ChevronDown size={16} />
-              </button>
+                <p className='whitespace-pre-wrap overflow-hidden m-0'>
+                  {application?.jobDescription}
+                </p>
+              </div>
             </div>
-            {showJobDescription && (
-              <p className='whitespace-pre-wrap'>
-                {application?.jobDescription}
-              </p>
-            )}
           </div>
         )}
         {editSuggestionsIsLoading ? (
