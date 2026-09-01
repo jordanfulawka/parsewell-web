@@ -164,7 +164,7 @@ function Applications() {
                   </span>
                   <span className='text-secondary-text text-sm'>
                     Uploaded{' '}
-                    {parseDate(baseResume.updatedAt, {
+                    {parseDate(baseResume.createdAt, {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric',
