@@ -12,6 +12,7 @@ interface BaseResume {
   fileName: string;
   originalFileUrl: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 interface Application {
