@@ -63,7 +63,7 @@ interface ApplicationsByStatus {
   numOther: number;
 }
 
-interface Insights {
+interface InsightsResponse {
   totalApplications: number;
   applicationsInPastWeek: number;
   applicationsByStatus: ApplicationsByStatus;
@@ -76,5 +76,5 @@ export type {
   EditSuggestion,
   ApplicationStatus,
   ReturnedCoverLetter,
-  Insights,
+  InsightsResponse,
 };

@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import type { Insights } from '../lib/types';
+import type { InsightsResponse } from '../lib/types';
 import { getInsights } from '../lib/api';
 import { useAuth } from '../contexts/AuthContext';
 
 function Insights() {
-  const [insights, setInsights] = useState<Insights | null>(null);
+  const [insights, setInsights] = useState<InsightsResponse | null>(null);
   const { token } = useAuth();
 
   useEffect(() => {
