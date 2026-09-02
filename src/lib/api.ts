@@ -454,6 +454,21 @@ async function getFinalMaterials(token: string, applicationId: string) {
   return response.json();
 }
 
+async function getInsights(token: string) {
+  const response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/api/v1/applications/insights`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response));
+  }
+  return response.json();
+}
+
 export {
   login,
   register,
@@ -481,6 +496,7 @@ export {
   checkTokenValidation,
   deleteResumeEdits,
   deleteCoverLetter,
+  getInsights,
 };
 
 //final-materials/${userId}/${applicationId}/resume/${randomUUID()}${ext}

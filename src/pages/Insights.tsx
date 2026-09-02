@@ -1,8 +1,24 @@
-import useApplications from '../hooks/useApplications';
-import type { Application } from '../lib/types';
+import { useEffect, useState } from 'react';
+import type { Insights } from '../lib/types';
+import { getInsights } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 
 function Insights() {
-  const { data: applications, byStatus, appliedInLastWeek } = useApplications();
+  const [insights, setInsights] = useState<Insights | null>(null);
+  const { token } = useAuth();
+
+  useEffect(() => {
+    async function fetchInsights() {
+      try {
+        if (!token) return;
+        const response = await getInsights(token);
+        setInsights(response);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    fetchInsights();
+  }, []);
 
   return (
     <div className='flex flex-col items-center'>
@@ -19,12 +35,7 @@ function Insights() {
               Total applications
             </p>
             <span className='text-4xl font-extrabold'>
-              {
-                applications.filter(
-                  (application: Application) =>
-                    application.applicationStatus !== 'DRAFT',
-                ).length
-              }
+              {insights?.totalApplications}
             </span>
           </div>
           <div className='bg-[#FDFBF8] flex flex-col justify-around p-5 flex-1 border border-input-border rounded-xl h-30'>
@@ -32,7 +43,7 @@ function Insights() {
               Applied in the past week
             </p>
             <span className='text-4xl font-extrabold'>
-              {appliedInLastWeek.length}
+              {insights?.applicationsInPastWeek}
             </span>
           </div>
         </div>
@@ -49,11 +60,11 @@ function Insights() {
                 <div
                   className='flex-1 rounded-full h-2 mr-5 bg-[#8A5C2C] '
                   style={{
-                    width: `${applications.length ? (byStatus['APPLIED'].length / applications.length) * 100 : 0}%`,
+                    width: `${insights?.totalApplications ? (insights?.applicationsByStatus?.numApplied / insights?.totalApplications) * 100 : 0}%`,
                   }}
                 />
               </div>
-              <span>{byStatus['APPLIED'].length}</span>
+              <span>{insights?.applicationsByStatus.numApplied}</span>
             </div>
             <div className='flex items-center'>
               <span className='text-sm font-bold text-[#345F3E] w-[25%]'>
@@ -63,11 +74,11 @@ function Insights() {
                 <div
                   className='flex-1 rounded-full h-2 mr-5 bg-[#345F3E] '
                   style={{
-                    width: `${applications.length ? (byStatus['HEARD_BACK'].length / applications.length) * 100 : 0}%`,
+                    width: `${insights?.totalApplications ? (insights?.applicationsByStatus?.numHeardBack / insights?.totalApplications) * 100 : 0}%`,
                   }}
                 />
               </div>
-              <span>{byStatus['HEARD_BACK'].length}</span>
+              <span>{insights?.applicationsByStatus.numHeardBack}</span>
             </div>
             <div className='flex items-center'>
               <span className='text-sm font-bold text-[#8A3B2E] w-[25%]'>
@@ -77,11 +88,11 @@ function Insights() {
                 <div
                   className='flex-1 rounded-full h-2 mr-5 bg-[#8A3B2E] '
                   style={{
-                    width: `${applications.length ? (byStatus['REJECTED'].length / applications.length) * 100 : 0}%`,
+                    width: `${insights?.totalApplications ? (insights?.applicationsByStatus?.numRejected / insights?.totalApplications) * 100 : 0}%`,
                   }}
                 />
               </div>
-              <span>{byStatus['REJECTED'].length}</span>
+              <span>{insights?.applicationsByStatus.numRejected}</span>
             </div>
             <div className='flex items-center'>
               <span className='text-sm font-bold text-[#8C4A3D] w-[25%]'>
@@ -91,11 +102,11 @@ function Insights() {
                 <div
                   className='flex-1 rounded-full h-2 mr-5 bg-[#8C4A3D] '
                   style={{
-                    width: `${applications.length ? (byStatus['GHOSTED'].length / applications.length) * 100 : 0}%`,
+                    width: `${insights?.totalApplications ? (insights?.applicationsByStatus?.numGhosted / insights?.totalApplications) * 100 : 0}%`,
                   }}
                 />
               </div>
-              <span>{byStatus['GHOSTED'].length}</span>
+              <span>{insights?.applicationsByStatus.numGhosted}</span>
             </div>
           </div>
         </div>

@@ -55,6 +55,20 @@ type ApplicationStatus =
   | 'DRAFT'
   | 'SUMMARY';
 
+interface ApplicationsByStatus {
+  numApplied: number;
+  numHeardBack: number;
+  numRejected: number;
+  numGhosted: number;
+  numOther: number;
+}
+
+interface Insights {
+  totalApplications: number;
+  applicationsInPastWeek: number;
+  applicationsByStatus: ApplicationsByStatus;
+}
+
 export type {
   User,
   BaseResume,
@@ -62,4 +76,5 @@ export type {
   EditSuggestion,
   ApplicationStatus,
   ReturnedCoverLetter,
+  Insights,
 };
