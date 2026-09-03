@@ -1,6 +1,6 @@
 import { EllipsisVertical, Trash2, FileText, FileDiff } from 'lucide-react';
 import { useState } from 'react';
-import DeleteModal from './DeleteModal';
+import GenericModal from './GenericModal';
 
 function ApplicationOptions({
   handleDelete,
@@ -50,9 +50,12 @@ function ApplicationOptions({
         </div>
       </div>
       {showDeleteModal && (
-        <DeleteModal
-          onClose={() => setShowDeleteModal(false)}
-          onDelete={handleDelete}
+        <GenericModal
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={handleDelete}
+          dialogText='Are you sure you want to delete this application?'
+          cancelText='No, go back!'
+          confirmText='Yes, delete'
         />
       )}
     </>
