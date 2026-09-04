@@ -13,7 +13,7 @@ import { Upload } from 'lucide-react';
 import FileOptions from './FileOptions';
 import ErrorBanner from './ErrorBanner';
 
-function FileUploader() {
+function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
   const [uploadedResume, setUploadedResume] = useState('');
   const [uploadedCoverLetter, setUploadedCoverLetter] = useState('');
   const [isDraggingResume, setIsDraggingResume] = useState(false);
@@ -94,6 +94,7 @@ function FileUploader() {
             file.name,
           );
           setUploadedResume(uploadedResume.resumeFilename);
+          onResumeUpload();
           setError('');
         }
       }

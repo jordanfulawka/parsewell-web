@@ -23,6 +23,7 @@ import useEditSuggestions from '../hooks/useEditSuggestions';
 import useCoverLetter from '../hooks/useCoverLetter';
 import ApplicationOptions from '../components/ApplicationOptions';
 import FileUploader from '../components/FileUploader';
+import GenericModal from '../components/GenericModal';
 // import FileUploader from '../components/FileUploader';
 
 function ApplicationDetails() {
@@ -31,6 +32,8 @@ function ApplicationDetails() {
   const [error, setError] = useState('');
   const [resumeEditRegenLoading, setResumeEditRegenLoading] = useState(false);
   const [coverLetterRegenLoading, setCoverLetterRegenLoading] = useState(false);
+  const [showConfirmAppliedModal, setShowConfirmAppliedModal] = useState(false);
+  const [resumeUploaded, setResumeUploaded] = useState(false);
 
   const { token } = useAuth();
   const params = useParams();
@@ -129,6 +132,18 @@ function ApplicationDetails() {
           }
           onDismiss={() => setError('')}
         />
+        {showConfirmAppliedModal && (
+          <GenericModal
+            onConfirm={() => {
+              updateStatus('APPLIED');
+              setShowConfirmAppliedModal(false);
+            }}
+            onCancel={() => setShowConfirmAppliedModal(false)}
+            dialogText="You haven't attached a resume yet! Are you sure you want to mark this application as applied?"
+            cancelText='No, go back'
+            confirmText='Yes, mark as applied'
+          />
+        )}
         {applicationIsLoading ? (
           <ApplicationDetailSkeleton />
         ) : (
@@ -180,6 +195,8 @@ function ApplicationDetails() {
                     className='bg-[#DDEBE0] text-[#345F3E] border border-[#345F3E] border-dashed w-fit rounded-full text-sm font-bold py-2 px-4 animate-pulse cursor-pointer'
                     onClick={() => {
                       if (!application) return;
+                      if (!resumeUploaded)
+                        return setShowConfirmAppliedModal(true);
                       updateStatus('APPLIED');
                     }}
                   >
@@ -291,7 +308,7 @@ function ApplicationDetails() {
             Attach the files you applied with, so you always know which version
             went out.
           </p>
-          <FileUploader />
+          <FileUploader onResumeUpload={() => setResumeUploaded(true)} />
         </div>
       </div>
     </div>
