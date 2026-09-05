@@ -21,9 +21,18 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
   const dragCounterResume = useRef(0);
   const dragCounterCoverLetter = useRef(0);
   const [error, setError] = useState('');
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const [coverLetterUploading, setCoverLetterUploading] = useState(false);
 
   const { token } = useAuth();
   const params = useParams();
+
+  useEffect(() => {
+    console.log('resume upload: ', resumeUploading);
+  }, [resumeUploading]);
+  useEffect(() => {
+    console.log('cover letter upload: ', coverLetterUploading);
+  }, [coverLetterUploading]);
 
   useEffect(() => {
     async function fetchFinalMaterials() {
@@ -53,6 +62,7 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
           return;
         }
         if (e.target.id === 'coverLetterUpload') {
+          setCoverLetterUploading(true);
           const presignedUrl = await getFinalMaterialPresignedPutUrl(
             token,
             params.id,
@@ -75,6 +85,7 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
           setUploadedCoverLetter(uploadedCoverLetter.coverLetterFilename);
           setError('');
         } else if (e.target.id === 'resumeUpload') {
+          setResumeUploading(true);
           const presignedUrl = await getFinalMaterialPresignedPutUrl(
             token,
             params.id,
@@ -100,6 +111,9 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
       }
     } catch (err) {
       setError(getErrorMessage(err, 'There was an error uploading this file'));
+    } finally {
+      setCoverLetterUploading(false);
+      setResumeUploading(false);
     }
   }
 
@@ -113,6 +127,7 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
       const file = e.dataTransfer.files[0];
       if (!file) return;
       if (e.currentTarget.id === 'resumeUploadDrop') {
+        setResumeUploading(true);
         const presignedUrl = await getFinalMaterialPresignedPutUrl(
           token,
           params.id,
@@ -131,6 +146,7 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
         onResumeUpload();
         setError('');
       } else if (e.currentTarget.id === 'coverLetterUploadDrop') {
+        setCoverLetterUploading(true);
         const presignedUrl = await getFinalMaterialPresignedPutUrl(
           token,
           params.id,
@@ -155,6 +171,9 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
       }
     } catch (err) {
       setError(getErrorMessage(err, 'There was an error uploading this file'));
+    } finally {
+      setCoverLetterUploading(false);
+      setResumeUploading(false);
     }
   }
 
@@ -204,7 +223,7 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
     <div className='flex gap-5 mt-2'>
       {error && <ErrorBanner message={error} />}
       <div
-        className={`flex-1 border-2 p-5 flex flex-col gap-3 rounded-xl transition-colors duration-150 ${isDraggingResume ? 'bg-[#F5EAD8] border-[#C9A66B] border-solid' : 'bg-[#FDFBF8] border-subtle-border border-dashed'}`}
+        className={`flex-1 border-2 p-3 flex flex-col gap-2 rounded-lg transition-colors duration-150 ${resumeUploading ? 'opacity-60 animate-pulse pointer-events-none' : ''} ${isDraggingResume ? 'bg-[#F5EAD8] border-[#C9A66B] border-solid' : 'bg-[#FDFBF8] border-subtle-border border-dashed'}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragEnter={(e) => {
@@ -249,7 +268,7 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
         )}
       </div>
       <div
-        className={`flex-1 border-2 p-5 flex flex-col gap-3 rounded-xl transition-colors duration-150 ${isDraggingCoverLetter ? 'bg-[#F5EAD8] border-[#C9A66B] border-solid' : 'bg-[#FDFBF8] border-subtle-border border-dashed'}`}
+        className={`flex-1 border-2 p-3 flex flex-col gap-2 rounded-lg transition-colors duration-150 ${coverLetterUploading ? 'opacity-60 animate-pulse pointer-events-none' : ''} ${isDraggingCoverLetter ? 'bg-[#F5EAD8] border-[#C9A66B] border-solid' : 'bg-[#FDFBF8] border-subtle-border border-dashed'}`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragEnter={(e) => {
