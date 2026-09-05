@@ -59,6 +59,14 @@ function StatusFilter({
         <span className='unselectable'>Ghosted </span>
         <span className='unselectable'>∙ {byStatus['GHOSTED'].length}</span>
       </div>
+      {selectedStatus.length > 0 && (
+        <button
+          className='flex items-center cursor-pointer'
+          onClick={() => setSelectedStatus([])}
+        >
+          <span className='text-secondary-text underline'>Clear</span>
+        </button>
+      )}
     </div>
   );
 }

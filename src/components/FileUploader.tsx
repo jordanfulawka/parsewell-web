@@ -128,6 +128,7 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
         if (!uploadResponse.ok) throw new Error('Failed to upload resume');
         const uploadedResume = await uploadResume(token, params.id, file.name);
         setUploadedResume(uploadedResume.resumeFilename);
+        onResumeUpload();
         setError('');
       } else if (e.currentTarget.id === 'coverLetterUploadDrop') {
         const presignedUrl = await getFinalMaterialPresignedPutUrl(

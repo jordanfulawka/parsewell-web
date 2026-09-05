@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router';
@@ -54,6 +54,10 @@ function ApplicationDetails() {
   } = useEditSuggestions();
 
   const { data: coverLetter } = useCoverLetter();
+
+  useEffect(() => {
+    window.scroll(0, 0);
+  }, []);
 
   async function handleCoverLetterGeneration() {
     try {
@@ -195,9 +199,11 @@ function ApplicationDetails() {
                     className='bg-[#DDEBE0] text-[#345F3E] border border-[#345F3E] border-dashed w-fit rounded-full text-sm font-bold py-2 px-4 animate-pulse cursor-pointer'
                     onClick={() => {
                       if (!application) return;
-                      if (!resumeUploaded)
-                        return setShowConfirmAppliedModal(true);
-                      updateStatus('APPLIED');
+                      if (!resumeUploaded) {
+                        setShowConfirmAppliedModal(true);
+                      } else {
+                        updateStatus('APPLIED');
+                      }
                     }}
                   >
                     Mark as applied
