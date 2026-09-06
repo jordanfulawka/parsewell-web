@@ -7,7 +7,7 @@ import {
   Search,
   ListSortDescending,
 } from 'lucide-react';
-import { useState, type ChangeEvent } from 'react';
+import { useRef, useState, type ChangeEvent } from 'react';
 import type { Application } from '../lib/types';
 import {
   getBaseResume,
@@ -36,6 +36,9 @@ function Applications() {
   const navigate = useNavigate();
 
   const queryClient = useQueryClient();
+
+  const dragCountBaseResume = useRef(0);
+  const [isDraggingBaseResume, setIsDraggingBaseResume] = useState(false);
 
   const {
     data: applications,
@@ -97,6 +100,29 @@ function Applications() {
     }
   }
 
+  async function handleUploadForDroppedFile(file: File) {
+    if (!token) return;
+    try {
+      setIsBaseResumeUploading(true);
+      const presignedUrl = await getBaseResumePresignedPutUrl(token);
+      if (!file) return;
+      const uploadResponse = await fetch(presignedUrl, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
+      if (!uploadResponse.ok) throw new Error('Failed to upload resume');
+      await mutation.mutateAsync(file.name);
+      setError('');
+    } catch (err) {
+      setError(getErrorMessage(err, 'Failed to upload resume'));
+    } finally {
+      setIsBaseResumeUploading(false);
+    }
+  }
+
   async function handleDownload() {
     try {
       if (!token || !baseResume) return;
@@ -113,6 +139,22 @@ function Applications() {
     } catch (err) {
       setError(getErrorMessage(err, 'Failed to download resume'));
     }
+  }
+
+  function handleDrop(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
+    dragCountBaseResume.current = 0;
+    setIsDraggingBaseResume(false);
+    const file = e.dataTransfer.files[0];
+    if (file.type !== 'application/pdf') {
+      setError('Only PDF files are supported');
+      return;
+    }
+    handleUploadForDroppedFile(e.dataTransfer.files[0]);
+  }
+
+  function handleDragOver(e: React.DragEvent<HTMLDivElement>) {
+    e.preventDefault();
   }
 
   return (
@@ -152,7 +194,24 @@ function Applications() {
             </div>
           </div>
         ) : baseResume ? (
-          <div className='bg-[#FDFBF8] border border-subtle-border p-7 rounded-2xl flex justify-between items-center'>
+          <div
+            className={` border p-7 rounded-2xl flex justify-between items-center ${isDraggingBaseResume ? 'bg-[#F5EAD8] border-[#C9A66B] border-solid' : 'bg-[#FDFBF8] border-subtle-border'}`}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              dragCountBaseResume.current += 1;
+              setIsDraggingBaseResume(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              dragCountBaseResume.current -= 1;
+              if (dragCountBaseResume.current <= 0) {
+                dragCountBaseResume.current = 0;
+                setIsDraggingBaseResume(false);
+              }
+            }}
+          >
             <div>
               <div className='flex items-center gap-2'>
                 <div className='bg-[#DDEBE0] p-3 rounded-lg'>

@@ -28,13 +28,6 @@ function FileUploader({ onResumeUpload }: { onResumeUpload: () => void }) {
   const params = useParams();
 
   useEffect(() => {
-    console.log('resume upload: ', resumeUploading);
-  }, [resumeUploading]);
-  useEffect(() => {
-    console.log('cover letter upload: ', coverLetterUploading);
-  }, [coverLetterUploading]);
-
-  useEffect(() => {
     async function fetchFinalMaterials() {
       try {
         if (!token) return;
