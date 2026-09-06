@@ -1,24 +1,8 @@
-import { useEffect, useState } from 'react';
-import type { InsightsResponse } from '../lib/types';
-import { getInsights } from '../lib/api';
-import { useAuth } from '../contexts/AuthContext';
+import useInsights from '../hooks/useInsights';
+import { LoaderCircle } from 'lucide-react';
 
 function Insights() {
-  const [insights, setInsights] = useState<InsightsResponse | null>(null);
-  const { token } = useAuth();
-
-  useEffect(() => {
-    async function fetchInsights() {
-      try {
-        if (!token) return;
-        const response = await getInsights(token);
-        setInsights(response);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    fetchInsights();
-  }, []);
+  const { data: insights, isPending } = useInsights();
 
   return (
     <div className='flex flex-col items-center'>
@@ -34,17 +18,29 @@ function Insights() {
             <p className='font-bold text-secondary-text text-sm'>
               Total applications
             </p>
-            <span className='text-4xl font-extrabold'>
-              {insights?.totalApplications}
-            </span>
+            {isPending ? (
+              <span className='animate-spin w-fit'>
+                <LoaderCircle />
+              </span>
+            ) : (
+              <span className='text-4xl font-extrabold'>
+                {insights?.totalApplications}
+              </span>
+            )}
           </div>
           <div className='bg-[#FDFBF8] flex flex-col justify-around p-5 flex-1 border border-input-border rounded-xl h-30'>
             <p className='font-bold text-secondary-text text-sm'>
               Applied in the past week
             </p>
-            <span className='text-4xl font-extrabold'>
-              {insights?.applicationsInPastWeek}
-            </span>
+            {isPending ? (
+              <span className='animate-spin w-fit'>
+                <LoaderCircle />
+              </span>
+            ) : (
+              <span className='text-4xl font-extrabold'>
+                {insights?.applicationsInPastWeek}
+              </span>
+            )}
           </div>
         </div>
         <div className='bg-[#FDFBF8] border border-input-border rounded-xl h-55 p-6'>
