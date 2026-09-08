@@ -39,6 +39,20 @@
       transform: translateY(-3px);
     }
   }
+
+  --animate-slide1: loginPreviewLineSlide 3s ease-in-out infinite;
+  --animate-slide2: loginPreviewLineSlide 3s ease-in-out infinite 300ms;
+  --animate-slide3: loginPreviewLineSlide 3s ease-in-out infinite 500ms;
+
+  @keyframes loginPreviewLineSlide {
+    0% {
+      transform: none;
+    }
+    100% {
+      transform: translateX(25%);
+      opacity: 10%;
+    }
+  }
 }
 
 body {
